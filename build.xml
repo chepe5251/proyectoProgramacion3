@@ -50,7 +50,8 @@
                classpathref="project.classpath"
                includeantruntime="false"
                encoding="UTF-8"
-               debug="true">
+               debug="true"
+               release="17">
             <compilerarg value="-Xlint:unchecked"/>
         </javac>
         <!-- Copia recursos (datos, config) al directorio de build -->
