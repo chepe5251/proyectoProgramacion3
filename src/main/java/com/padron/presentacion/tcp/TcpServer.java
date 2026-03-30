@@ -85,7 +85,9 @@ public class TcpServer {
      */
     public void detener() {
         corriendo = false;
-        // TODO: cerrar serverSocket si no es null
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            try { serverSocket.close(); } catch (IOException ignored) {}
+        }
     }
 
     // ---------------------------------------------------------------
