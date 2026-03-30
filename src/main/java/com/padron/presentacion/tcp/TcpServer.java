@@ -64,8 +64,18 @@ public class TcpServer {
      * @throws IOException si no se puede abrir el puerto
      */
     public void iniciar() throws IOException {
-        // TODO: implementar
-        throw new UnsupportedOperationException("Pendiente de implementación.");
+        serverSocket = new ServerSocket(puerto);
+        corriendo = true;
+        System.out.println("Servidor TCP escuchando en puerto " + puerto);
+        while (corriendo) {
+            try {
+                Socket cliente = serverSocket.accept();
+                new Thread(() -> manejarCliente(cliente)).start();
+            } catch (IOException e) {
+                if (!corriendo) break;
+                System.err.println("Error aceptando conexion TCP: " + e.getMessage());
+            }
+        }
     }
 
     /**
