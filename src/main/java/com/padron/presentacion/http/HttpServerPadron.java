@@ -101,7 +101,40 @@ public class HttpServerPadron {
      * @param cliente socket del cliente conectado
      */
     private void manejarCliente(Socket cliente) {
-        // TODO: implementar en try-with-resources
+        try (
+            BufferedReader entrada = new BufferedReader(
+                new InputStreamReader(cliente.getInputStream()));
+            PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)
+        ) {
+            // Leer primera línea: "GET /padron?cedula=X&formato=Y HTTP/1.1"
+            String requestLine = entrada.readLine();
+            if (requestLine == null || requestLine.isBlank()) return;
+
+            // Consumir headers hasta línea vacía (requerido por protocolo HTTP)
+            String headerLine;
+            while ((headerLine = entrada.readLine()) != null && !headerLine.isBlank()) {}
+
+            // Extraer query string
+            String queryString = "";
+            if (requestLine.contains("?")) {
+                queryString = requestLine.split("\\?")[1].split(" ")[0];
+            }
+
+            SolicitudPadron solicitud = parsearParametros(queryString);
+            RespuestaPadron respuesta = servicio.consultarPadron(solicitud);
+
+            String contentType = solicitud.getFormato() == FormatoSalida.XML
+                               ? "application/xml" : "application/json";
+            String body        = serializador.serializar(respuesta, solicitud.getFormato());
+            int    status      = respuesta.isExito() ? 200 : 400;
+
+            salida.print(construirRespuestaHttp(status, contentType, body));
+            salida.flush();
+        } catch (IOException e) {
+            System.err.println("Error atendiendo cliente HTTP: " + e.getMessage());
+        } finally {
+            try { cliente.close(); } catch (IOException ignored) {}
+        }
     }
 
     /**
