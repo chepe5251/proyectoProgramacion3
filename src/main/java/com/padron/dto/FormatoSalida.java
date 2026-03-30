@@ -17,10 +17,12 @@ public enum FormatoSalida {
 
     private final String codigo;
 
+    /** Asocia cada valor del enum con el texto esperado en la solicitud. */
     FormatoSalida(String codigo) {
         this.codigo = codigo;
     }
 
+    /** Retorna el código textual del formato, por ejemplo "json" o "xml". */
     public String getCodigo() {
         return codigo;
     }
