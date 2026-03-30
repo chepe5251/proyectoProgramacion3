@@ -6,7 +6,10 @@ import com.padron.dto.SolicitudPadron;
 import com.padron.logica.ServicioPadron;
 import com.padron.util.Serializador;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -93,7 +96,20 @@ public class TcpServer {
      * @param cliente socket del cliente conectado
      */
     private void manejarCliente(Socket cliente) {
-        // TODO: implementar en try-with-resources
+        try (
+            BufferedReader entrada = new BufferedReader(
+                new InputStreamReader(cliente.getInputStream()));
+            PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)
+        ) {
+            String lineaTexto = entrada.readLine();
+            SolicitudPadron solicitud = parsearSolicitud(lineaTexto);
+            RespuestaPadron respuesta = servicio.consultarPadron(solicitud);
+            salida.println(serializador.serializar(respuesta, solicitud.getFormato()));
+        } catch (IOException e) {
+            System.err.println("Error atendiendo cliente TCP: " + e.getMessage());
+        } finally {
+            try { cliente.close(); } catch (IOException ignored) {}
+        }
     }
 
     /**
