@@ -13,11 +13,9 @@ package com.padron.entidades;
  */
 public class Direccion {
 
-    private int    codigoProvincia;
+    private String codElec;
     private String nombreProvincia;
-    private int    codigoCanton;
     private String nombreCanton;
-    private int    codigoDistrito;
     private String nombreDistrito;
 
     // ---------------------------------------------------------------
@@ -28,35 +26,26 @@ public class Direccion {
         // Vacío: requerido para serialización
     }
 
-    public Direccion(int codigoProvincia, String nombreProvincia,
-                     int codigoCanton,    String nombreCanton,
-                     int codigoDistrito,  String nombreDistrito) {
-        this.codigoProvincia  = codigoProvincia;
-        this.nombreProvincia  = nombreProvincia;
-        this.codigoCanton     = codigoCanton;
-        this.nombreCanton     = nombreCanton;
-        this.codigoDistrito   = codigoDistrito;
-        this.nombreDistrito   = nombreDistrito;
+    public Direccion(String codElec, String nombreProvincia,
+                     String nombreCanton, String nombreDistrito) {
+        this.codElec = codElec;
+        this.nombreProvincia = nombreProvincia;
+        this.nombreCanton = nombreCanton;
+        this.nombreDistrito = nombreDistrito;
     }
 
     // ---------------------------------------------------------------
     // Getters y Setters
     // ---------------------------------------------------------------
 
-    public int    getCodigoProvincia()           { return codigoProvincia; }
-    public void   setCodigoProvincia(int v)      { this.codigoProvincia = v; }
+    public String getCodElec()                   { return codElec; }
+    public void   setCodElec(String v)           { this.codElec = v; }
 
     public String getNombreProvincia()           { return nombreProvincia; }
     public void   setNombreProvincia(String v)   { this.nombreProvincia = v; }
 
-    public int    getCodigoCanton()              { return codigoCanton; }
-    public void   setCodigoCanton(int v)         { this.codigoCanton = v; }
-
     public String getNombreCanton()              { return nombreCanton; }
     public void   setNombreCanton(String v)      { this.nombreCanton = v; }
-
-    public int    getCodigoDistrito()            { return codigoDistrito; }
-    public void   setCodigoDistrito(int v)       { this.codigoDistrito = v; }
 
     public String getNombreDistrito()            { return nombreDistrito; }
     public void   setNombreDistrito(String v)    { this.nombreDistrito = v; }
