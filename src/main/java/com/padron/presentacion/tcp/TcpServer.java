@@ -106,8 +106,20 @@ public class TcpServer {
      * @return           SolicitudPadron con los campos extraídos
      */
     private SolicitudPadron parsearSolicitud(String lineaTexto) {
-        // TODO: split por '&', luego por '=', poblar SolicitudPadron
-        return null;
+        SolicitudPadron solicitud = new SolicitudPadron();
+        if (lineaTexto == null || lineaTexto.isBlank()) return solicitud;
+        for (String par : lineaTexto.trim().split("&")) {
+            String[] kv = par.split("=", 2);
+            if (kv.length < 2) continue;
+            switch (kv[0].trim()) {
+                case "cedula":  solicitud.setCedula(kv[1].trim()); break;
+                case "formato":
+                    try { solicitud.setFormato(FormatoSalida.fromString(kv[1].trim())); }
+                    catch (IllegalArgumentException e) { /* mantener default JSON */ }
+                    break;
+            }
+        }
+        return solicitud;
     }
 
     // ---------------------------------------------------------------
