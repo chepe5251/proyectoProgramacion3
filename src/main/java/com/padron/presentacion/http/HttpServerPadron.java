@@ -6,7 +6,10 @@ import com.padron.dto.SolicitudPadron;
 import com.padron.logica.ServicioPadron;
 import com.padron.util.Serializador;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -66,18 +69,28 @@ public class HttpServerPadron {
      * @throws IOException si no se puede abrir el puerto
      */
     public void iniciar() throws IOException {
-        // TODO: implementar
-        throw new UnsupportedOperationException("Pendiente de implementación.");
+        serverSocket = new ServerSocket(puerto);
+        corriendo = true;
+        System.out.println("Servidor HTTP escuchando en puerto " + puerto);
+        while (corriendo) {
+            try {
+                Socket cliente = serverSocket.accept();
+                new Thread(() -> manejarCliente(cliente)).start();
+            } catch (IOException e) {
+                if (!corriendo) break;
+                System.err.println("Error aceptando conexion HTTP: " + e.getMessage());
+            }
+        }
     }
 
     /**
-     * Detiene el servidor.
-     *
-     * TODO (feature/http): implementar este método.
+     * Detiene el servidor cerrando el ServerSocket.
      */
     public void detener() {
         corriendo = false;
-        // TODO: cerrar serverSocket si no es null
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            try { serverSocket.close(); } catch (IOException ignored) {}
+        }
     }
 
     // ---------------------------------------------------------------
@@ -98,7 +111,40 @@ public class HttpServerPadron {
      * @param cliente socket del cliente conectado
      */
     private void manejarCliente(Socket cliente) {
-        // TODO: implementar en try-with-resources
+        try (
+            BufferedReader entrada = new BufferedReader(
+                new InputStreamReader(cliente.getInputStream()));
+            PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)
+        ) {
+            // Leer primera línea: "GET /padron?cedula=X&formato=Y HTTP/1.1"
+            String requestLine = entrada.readLine();
+            if (requestLine == null || requestLine.isBlank()) return;
+
+            // Consumir headers hasta línea vacía (requerido por protocolo HTTP)
+            String headerLine;
+            while ((headerLine = entrada.readLine()) != null && !headerLine.isBlank()) {}
+
+            // Extraer query string
+            String queryString = "";
+            if (requestLine.contains("?")) {
+                queryString = requestLine.split("\\?")[1].split(" ")[0];
+            }
+
+            SolicitudPadron solicitud = parsearParametros(queryString);
+            RespuestaPadron respuesta = servicio.consultarPadron(solicitud);
+
+            String contentType = solicitud.getFormato() == FormatoSalida.XML
+                               ? "application/xml" : "application/json";
+            String body        = serializador.serializar(respuesta, solicitud.getFormato());
+            int    status      = respuesta.isExito() ? 200 : 400;
+
+            salida.print(construirRespuestaHttp(status, contentType, body));
+            salida.flush();
+        } catch (IOException e) {
+            System.err.println("Error atendiendo cliente HTTP: " + e.getMessage());
+        } finally {
+            try { cliente.close(); } catch (IOException ignored) {}
+        }
     }
 
     /**
@@ -112,8 +158,20 @@ public class HttpServerPadron {
      * @return            SolicitudPadron con los parámetros extraídos
      */
     private SolicitudPadron parsearParametros(String queryString) {
-        // TODO: split por '&', luego por '=', poblar SolicitudPadron
-        return null;
+        SolicitudPadron solicitud = new SolicitudPadron();
+        if (queryString == null || queryString.isBlank()) return solicitud;
+        for (String par : queryString.split("&")) {
+            String[] kv = par.split("=", 2);
+            if (kv.length < 2) continue;
+            switch (kv[0].trim()) {
+                case "cedula":  solicitud.setCedula(kv[1].trim()); break;
+                case "formato":
+                    try { solicitud.setFormato(FormatoSalida.fromString(kv[1].trim())); }
+                    catch (IllegalArgumentException e) { /* mantener default JSON */ }
+                    break;
+            }
+        }
+        return solicitud;
     }
 
     /**
@@ -125,8 +183,16 @@ public class HttpServerPadron {
      *  - body: el JSON o XML serializado
      */
     private String construirRespuestaHttp(int statusCode, String contentType, String body) {
-        // TODO: implementar
-        return "";
+        String statusText = statusCode == 200 ? "OK"
+                          : statusCode == 400 ? "Bad Request"
+                          : statusCode == 404 ? "Not Found"
+                          : "Internal Server Error";
+        return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n"
+             + "Content-Type: " + contentType + "; charset=UTF-8\r\n"
+             + "Content-Length: " + body.getBytes().length + "\r\n"
+             + "Connection: close\r\n"
+             + "\r\n"
+             + body;
     }
 
     // ---------------------------------------------------------------

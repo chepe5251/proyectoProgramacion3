@@ -20,19 +20,25 @@ import com.padron.util.Serializador;
  */
 public class Main {
 
-    // Configuración por defecto (puede venir de build.properties)
-    private static final int    PUERTO_TCP   = 5000;
-    private static final int    PUERTO_HTTP  = 8080;
-    private static final String RUTA_PADRON    = "resources/data/PADRON.txt";
-    private static final String RUTA_DISTELEC  = "resources/data/distelec.txt";
+    private static final int PUERTO_TCP  = 5000;
+    private static final int PUERTO_HTTP = 8080;
 
     public static void main(String[] args) throws Exception {
 
         System.out.println("=== Sistema de Consulta de Padron Electoral ===");
 
+        // Rutas a los archivos de datos — se pasan como argumentos al ejecutar:
+        //   java -jar padron-electoral.jar <ruta_PADRON.txt> <ruta_distelec.txt>
+        // Si no se pasan argumentos, usa las rutas por defecto del proyecto Maven.
+        String rutaPadron   = args.length > 0 ? args[0] : "src/main/resources/data/PADRON.txt";
+        String rutaDistelec = args.length > 1 ? args[1] : "src/main/resources/data/distelec.txt";
+
+        System.out.println("Ruta PADRON.txt  : " + rutaPadron);
+        System.out.println("Ruta distelec.txt: " + rutaDistelec);
+
         // 1. Cargar repositorios de datos
-        RepositorioPadron   repoPadron   = new RepositorioPadron(RUTA_PADRON);
-        RepositorioDistelec repoDistelec = new RepositorioDistelec(RUTA_DISTELEC);
+        RepositorioPadron   repoPadron   = new RepositorioPadron(rutaPadron);
+        RepositorioDistelec repoDistelec = new RepositorioDistelec(rutaDistelec);
 
         // TODO: descomentar cuando feature/repositorios esté mergeado
         // repoPadron.cargarDesdeArchivo();
