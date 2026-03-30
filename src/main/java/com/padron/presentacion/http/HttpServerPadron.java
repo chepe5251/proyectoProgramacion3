@@ -6,7 +6,10 @@ import com.padron.dto.SolicitudPadron;
 import com.padron.logica.ServicioPadron;
 import com.padron.util.Serializador;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -112,8 +115,20 @@ public class HttpServerPadron {
      * @return            SolicitudPadron con los parámetros extraídos
      */
     private SolicitudPadron parsearParametros(String queryString) {
-        // TODO: split por '&', luego por '=', poblar SolicitudPadron
-        return null;
+        SolicitudPadron solicitud = new SolicitudPadron();
+        if (queryString == null || queryString.isBlank()) return solicitud;
+        for (String par : queryString.split("&")) {
+            String[] kv = par.split("=", 2);
+            if (kv.length < 2) continue;
+            switch (kv[0].trim()) {
+                case "cedula":  solicitud.setCedula(kv[1].trim()); break;
+                case "formato":
+                    try { solicitud.setFormato(FormatoSalida.fromString(kv[1].trim())); }
+                    catch (IllegalArgumentException e) { /* mantener default JSON */ }
+                    break;
+            }
+        }
+        return solicitud;
     }
 
     /**
