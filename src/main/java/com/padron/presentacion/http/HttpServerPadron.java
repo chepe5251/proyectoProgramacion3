@@ -69,18 +69,28 @@ public class HttpServerPadron {
      * @throws IOException si no se puede abrir el puerto
      */
     public void iniciar() throws IOException {
-        // TODO: implementar
-        throw new UnsupportedOperationException("Pendiente de implementación.");
+        serverSocket = new ServerSocket(puerto);
+        corriendo = true;
+        System.out.println("Servidor HTTP escuchando en puerto " + puerto);
+        while (corriendo) {
+            try {
+                Socket cliente = serverSocket.accept();
+                new Thread(() -> manejarCliente(cliente)).start();
+            } catch (IOException e) {
+                if (!corriendo) break;
+                System.err.println("Error aceptando conexion HTTP: " + e.getMessage());
+            }
+        }
     }
 
     /**
-     * Detiene el servidor.
-     *
-     * TODO (feature/http): implementar este método.
+     * Detiene el servidor cerrando el ServerSocket.
      */
     public void detener() {
         corriendo = false;
-        // TODO: cerrar serverSocket si no es null
+        if (serverSocket != null && !serverSocket.isClosed()) {
+            try { serverSocket.close(); } catch (IOException ignored) {}
+        }
     }
 
     // ---------------------------------------------------------------
