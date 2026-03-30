@@ -8,7 +8,7 @@ disponible a través de interfaces TCP y HTTP con respuesta en JSON o XML.
 ## Arquitectura por capas
 
 ```
-src/com/padron/
+src/main/java/com/padron/
 ├── entidades/          Clases del dominio: Persona, Direccion
 ├── dto/                Objetos de transferencia: SolicitudPadron, RespuestaPadron, FormatoSalida
 ├── datos/              Repositorios: lectura de PADRON.txt y distelec.txt
@@ -18,6 +18,9 @@ src/com/padron/
 │   ├── tcp/            Servidor TCP: TcpServer
 │   └── http/           Servidor HTTP: HttpServerPadron
 └── Main.java           Punto de entrada
+
+src/main/resources/data/
+└── (colocar aquí PADRON.txt y distelec.txt — no van en el repo)
 ```
 
 **Regla de dependencias (las capas solo dependen hacia abajo):**
@@ -50,12 +53,19 @@ mvn test
 # Generar JAR ejecutable
 mvn package
 
-# Ejecutar
+# Ejecutar (sin argumentos — usa rutas por defecto)
 java -jar target/padron-electoral-1.0-SNAPSHOT.jar
+
+# Ejecutar con rutas personalizadas a los archivos de datos
+java -jar target/padron-electoral-1.0-SNAPSHOT.jar /ruta/a/PADRON.txt /ruta/a/distelec.txt
 
 # Limpiar
 mvn clean
 ```
+
+Una vez corriendo, el sistema escucha en:
+- **TCP:** puerto `5000` — enviar `cedula=XXXXXXXXX&formato=json`
+- **HTTP:** puerto `8080` — `GET /padron?cedula=XXXXXXXXX&formato=json`
 
 ---
 
@@ -69,7 +79,7 @@ El proyecto está dividido en 4 partes independientes, una por colaborador:
 | 2   | `feature/repositorios`  | `datos/`                                                 | feature/modelo     |
 | 3   | `feature/logica`        | `logica/`, `util/Serializador.java`                      | feature/repositorios |
 | 4   | `feature/presentacion`  | `presentacion/tcp/`, `presentacion/http/`                | feature/logica     |
-| —   | `main`                  | `Main.java`, `README.md`, `build.xml`                    | todos              |
+| —   | `main`                  | `Main.java`, `README.md`, `pom.xml`                      | todos              |
 
 > **Regla clave:** nadie toca archivos de otro desarrollador.
 > Si se necesita un cambio en código ajeno, se abre un issue y se coordina.
@@ -157,7 +167,7 @@ git checkout main
 git pull origin main
 git checkout feature/mi-tarea
 git merge main          # resolver conflictos si los hay
-ant compile             # verificar que compila
+mvn compile             # verificar que compila
 ```
 
 ### 4. Pull Request
@@ -174,7 +184,7 @@ Cada desarrollador tiene archivos "propios" según la tabla de ramas.
 Los únicos archivos compartidos son:
 
 - `Main.java` — solo el líder toca este archivo
-- `build.xml` — coordinar cambios en el canal del equipo
+- `pom.xml` — coordinar cambios en el canal del equipo
 - `README.md` — cualquiera puede editar secciones distintas
 
 Si dos personas necesitan el mismo archivo, coordinarlo antes de hacer cambios.
@@ -184,23 +194,25 @@ Si dos personas necesitan el mismo archivo, coordinarlo antes de hacer cambios.
 ## Colocar los archivos de datos
 
 Los archivos `PADRON.txt` y `distelec.txt` NO están en el repositorio (ver `.gitignore`).
-Cada desarrollador debe obtenerlos y colocarlos en:
+Cada desarrollador debe obtenerlos del docente y colocarlos en:
 
 ```
-resources/data/PADRON.txt
-resources/data/distelec.txt
+src/main/resources/data/PADRON.txt
+src/main/resources/data/distelec.txt
 ```
+
+O bien pasarlos como argumentos al ejecutar (ver sección de ejecución arriba).
 
 ---
 
 ## Estado del proyecto
 
-| Componente              | Estado       |
-|-------------------------|--------------|
-| Entidades y DTOs        | Esqueleto    |
-| Repositorio Padrón      | Pendiente    |
-| Repositorio Distelec    | Pendiente    |
-| Lógica de negocio       | Pendiente    |
-| Serialización JSON/XML  | Pendiente    |
-| Servidor TCP            | Pendiente    |
-| Servidor HTTP           | Pendiente    |
+| Componente              | Estado        | Rama                    |
+|-------------------------|---------------|-------------------------|
+| Entidades y DTOs        | En progreso   | `feature/modelo`        |
+| Repositorio Padrón      | Pendiente     | `feature/repositorios`  |
+| Repositorio Distelec    | Pendiente     | `feature/repositorios`  |
+| Lógica de negocio       | Pendiente     | `feature/logica`        |
+| Serialización JSON/XML  | Pendiente     | `feature/logica`        |
+| Servidor TCP            | Completado    | mergeado en `main`      |
+| Servidor HTTP           | Completado    | mergeado en `main`      |
