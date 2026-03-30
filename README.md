@@ -32,9 +32,9 @@ presentacion  →  logica  →  datos  →  entidades
 
 ## Requisitos
 
-- JDK 11 o superior
-- Apache Ant 1.10+
-- Archivos `PADRON.txt` y `distelec.txt` colocados en `resources/data/` (no van en el repo)
+- JDK 17 o superior (probado con JDK 24)
+- Apache Maven 3.8+
+- Archivos `PADRON.txt` y `distelec.txt` colocados en `src/main/resources/data/` (no van en el repo)
 
 ---
 
@@ -42,16 +42,19 @@ presentacion  →  logica  →  datos  →  entidades
 
 ```bash
 # Compilar
-ant compile
+mvn compile
+
+# Ejecutar pruebas
+mvn test
+
+# Generar JAR ejecutable
+mvn package
 
 # Ejecutar
-ant run
-
-# Generar JAR
-ant jar
+java -jar target/padron-electoral-1.0-SNAPSHOT.jar
 
 # Limpiar
-ant clean
+mvn clean
 ```
 
 ---

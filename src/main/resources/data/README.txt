@@ -8,7 +8,9 @@ Archivos necesarios:
   - PADRON.txt     Padrón electoral con datos de ciudadanos
   - distelec.txt   Tabla de provincias, cantones y distritos
 
-Obtén los archivos del docente o del equipo y colócalos aquí antes de ejecutar el proyecto.
+Obtén los archivos del docente o del equipo y colócalos en:
+  src/main/resources/data/PADRON.txt
+  src/main/resources/data/distelec.txt
 
 Formato esperado de PADRON.txt:
   cedula,nombre,primerApellido,segundoApellido,codigoProvincia,codigoCanton,codigoDistrito

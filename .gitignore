@@ -4,12 +4,6 @@
 .claude/
 
 # ===========================
-# Ant — directorios generados
-# ===========================
-build/
-dist/
-
-# ===========================
 # Java
 # ===========================
 *.class
@@ -68,8 +62,6 @@ build.local.properties
 *.swp
 
 # ===========================
-# Maven (no usamos Maven — ignorar artefactos si quedan)
+# Maven — solo ignorar el directorio de build generado
 # ===========================
 target/
-pom.xml
-src/main/
