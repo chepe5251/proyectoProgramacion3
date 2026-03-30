@@ -140,8 +140,16 @@ public class HttpServerPadron {
      *  - body: el JSON o XML serializado
      */
     private String construirRespuestaHttp(int statusCode, String contentType, String body) {
-        // TODO: implementar
-        return "";
+        String statusText = statusCode == 200 ? "OK"
+                          : statusCode == 400 ? "Bad Request"
+                          : statusCode == 404 ? "Not Found"
+                          : "Internal Server Error";
+        return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n"
+             + "Content-Type: " + contentType + "; charset=UTF-8\r\n"
+             + "Content-Length: " + body.getBytes().length + "\r\n"
+             + "Connection: close\r\n"
+             + "\r\n"
+             + body;
     }
 
     // ---------------------------------------------------------------
