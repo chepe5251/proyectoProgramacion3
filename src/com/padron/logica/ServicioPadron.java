@@ -1,0 +1,81 @@
+package com.padron.logica;
+
+import com.padron.datos.RepositorioDistelec;
+import com.padron.datos.RepositorioPadron;
+import com.padron.dto.RespuestaPadron;
+import com.padron.dto.SolicitudPadron;
+import com.padron.entidades.Direccion;
+import com.padron.entidades.Persona;
+
+/**
+ * Servicio central de negocio del sistema.
+ * Coordina los repositorios y produce una RespuestaPadron.
+ *
+ * RAMA:  feature/logica
+ * OWNER: Desarrollador 3
+ *
+ * Esta clase NO sabe nada de TCP, HTTP, JSON ni XML.
+ * Esa responsabilidad es de las capas de presentación y util.
+ *
+ * TODO (feature/logica):
+ *  - Implementar consultarPadron()
+ *  - Implementar validarCedula()
+ *  - Agregar logging básico (System.out o java.util.logging)
+ */
+public class ServicioPadron {
+
+    private final RepositorioPadron    repositorioPadron;
+    private final RepositorioDistelec  repositorioDistelec;
+
+    // ---------------------------------------------------------------
+    // Constructor
+    // ---------------------------------------------------------------
+
+    public ServicioPadron(RepositorioPadron repositorioPadron,
+                          RepositorioDistelec repositorioDistelec) {
+        this.repositorioPadron   = repositorioPadron;
+        this.repositorioDistelec = repositorioDistelec;
+    }
+
+    // ---------------------------------------------------------------
+    // Métodos públicos
+    // ---------------------------------------------------------------
+
+    /**
+     * Procesa una solicitud de consulta al padrón.
+     *
+     * TODO (feature/logica): implementar este método.
+     *  Pasos sugeridos:
+     *  1. Validar la solicitud (cedula no vacía, formato reconocido)
+     *  2. Buscar la persona en RepositorioPadron
+     *  3. Si no existe → retornar RespuestaPadron.error("Cédula no encontrada.")
+     *  4. Resolver la dirección con RepositorioDistelec
+     *  5. Retornar RespuestaPadron.exitosa(persona, direccion)
+     *
+     * @param solicitud datos de la consulta
+     * @return          respuesta con los datos o mensaje de error
+     */
+    public RespuestaPadron consultarPadron(SolicitudPadron solicitud) {
+        // TODO: implementar lógica de negocio
+        throw new UnsupportedOperationException("Pendiente de implementación.");
+    }
+
+    // ---------------------------------------------------------------
+    // Métodos privados
+    // ---------------------------------------------------------------
+
+    /**
+     * Valida que la cédula tenga el formato correcto.
+     *
+     * TODO (feature/logica): implementar validación.
+     *  - No nula, no vacía
+     *  - Solo dígitos
+     *  - Exactamente 9 caracteres
+     *
+     * @return true si la cédula es válida
+     */
+    private boolean validarCedula(String cedula) {
+        // TODO: implementar
+        return false;
+    }
+}
