@@ -13,54 +13,60 @@ package com.padron.entidades;
  */
 public class Direccion {
 
-    private String codElec;
-    private String nombreProvincia;
-    private String nombreCanton;
-    private String nombreDistrito;
-
-    // ---------------------------------------------------------------
-    // Constructores
-    // ---------------------------------------------------------------
+    private String codElectoral;
+    private String provincia;
+    private String canton;
+    private String distrito;
 
     public Direccion() {
-        // Vacío: requerido para serialización
     }
 
-    public Direccion(String codElec, String nombreProvincia,
-                     String nombreCanton, String nombreDistrito) {
-        this.codElec = codElec;
-        this.nombreProvincia = nombreProvincia;
-        this.nombreCanton = nombreCanton;
-        this.nombreDistrito = nombreDistrito;
+    public Direccion(String codElectoral, String provincia, String canton, String distrito) {
+        this.codElectoral = codElectoral;
+        this.provincia = provincia;
+        this.canton = canton;
+        this.distrito = distrito;
     }
 
-    // ---------------------------------------------------------------
-    // Getters y Setters
-    // ---------------------------------------------------------------
+    public String getCodElectoral() {
+        return codElectoral;
+    }
 
-    public String getCodElec()                   { return codElec; }
-    public void   setCodElec(String v)           { this.codElec = v; }
+    public void setCodElectoral(String codElectoral) {
+        this.codElectoral = codElectoral;
+    }
 
-    public String getNombreProvincia()           { return nombreProvincia; }
-    public void   setNombreProvincia(String v)   { this.nombreProvincia = v; }
+    public String getProvincia() {
+        return provincia;
+    }
 
-    public String getNombreCanton()              { return nombreCanton; }
-    public void   setNombreCanton(String v)      { this.nombreCanton = v; }
+    public void setProvincia(String provincia) {
+        this.provincia = provincia;
+    }
 
-    public String getNombreDistrito()            { return nombreDistrito; }
-    public void   setNombreDistrito(String v)    { this.nombreDistrito = v; }
+    public String getCanton() {
+        return canton;
+    }
 
-    // ---------------------------------------------------------------
-    // Utilidades
-    // ---------------------------------------------------------------
+    public void setCanton(String canton) {
+        this.canton = canton;
+    }
 
-    /** Retorna la dirección completa: "Provincia, Cantón, Distrito". */
-    public String getDireccionCompleta() {
-        return nombreProvincia + ", " + nombreCanton + ", " + nombreDistrito;
+    public String getDistrito() {
+        return distrito;
+    }
+
+    public void setDistrito(String distrito) {
+        this.distrito = distrito;
     }
 
     @Override
     public String toString() {
-        return "Direccion{" + getDireccionCompleta() + "}";
+        return "Direccion{" +
+                "codElectoral='" + codElectoral + '\'' +
+                ", provincia='" + provincia + '\'' +
+                ", canton='" + canton + '\'' +
+                ", distrito='" + distrito + '\'' +
+                '}';
     }
 }

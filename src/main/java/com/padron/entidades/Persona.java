@@ -14,78 +14,74 @@ package com.padron.entidades;
 public class Persona {
 
     private String cedula;
+    private String codElectoral;
     private String nombre;
     private String primerApellido;
     private String segundoApellido;
-    private int    codigoProvincia;
-    private int    codigoCanton;
-    private int    codigoDistrito;
-
-    // ---------------------------------------------------------------
-    // Constructores
-    // ---------------------------------------------------------------
 
     public Persona() {
-        // Vacío: requerido para serialización
     }
 
-    /** Crea una persona con sus datos de identidad y ubicación electoral. */
-    public Persona(String cedula, String nombre,
-                   String primerApellido, String segundoApellido,
-                   int codigoProvincia, int codigoCanton, int codigoDistrito) {
-        this.cedula          = cedula;
-        this.nombre          = nombre;
-        this.primerApellido  = primerApellido;
+    public Persona(String cedula, String codElectoral, String nombre, String primerApellido, String segundoApellido) {
+        this.cedula = cedula;
+        this.codElectoral = codElectoral;
+        this.nombre = nombre;
+        this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
-        this.codigoProvincia = codigoProvincia;
-        this.codigoCanton    = codigoCanton;
-        this.codigoDistrito  = codigoDistrito;
     }
 
-    // ---------------------------------------------------------------
-    // Getters y Setters
-    // ---------------------------------------------------------------
+    public String getCedula() {
+        return cedula;
+    }
 
-    /** Retorna la cédula única de la persona. */
-    public String getCedula()            { return cedula; }
-    public void   setCedula(String v)    { this.cedula = v; }
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
+    }
 
-    /** Retorna el nombre de pila registrado. */
-    public String getNombre()            { return nombre; }
-    public void   setNombre(String v)    { this.nombre = v; }
+    public String getCodElectoral() {
+        return codElectoral;
+    }
 
-    /** Retorna el primer apellido registrado. */
-    public String getPrimerApellido()           { return primerApellido; }
-    public void   setPrimerApellido(String v)   { this.primerApellido = v; }
+    public void setCodElectoral(String codElectoral) {
+        this.codElectoral = codElectoral;
+    }
 
-    /** Retorna el segundo apellido registrado. */
-    public String getSegundoApellido()          { return segundoApellido; }
-    public void   setSegundoApellido(String v)  { this.segundoApellido = v; }
+    public String getNombre() {
+        return nombre;
+    }
 
-    /** Retorna el código de provincia asociado a la persona. */
-    public int  getCodigoProvincia()       { return codigoProvincia; }
-    public void setCodigoProvincia(int v)  { this.codigoProvincia = v; }
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-    /** Retorna el código de cantón asociado a la persona. */
-    public int  getCodigoCanton()          { return codigoCanton; }
-    public void setCodigoCanton(int v)     { this.codigoCanton = v; }
+    public String getPrimerApellido() {
+        return primerApellido;
+    }
 
-    /** Retorna el código de distrito asociado a la persona. */
-    public int  getCodigoDistrito()        { return codigoDistrito; }
-    public void setCodigoDistrito(int v)   { this.codigoDistrito = v; }
+    public void setPrimerApellido(String primerApellido) {
+        this.primerApellido = primerApellido;
+    }
 
-    // ---------------------------------------------------------------
-    // Utilidades
-    // ---------------------------------------------------------------
+    public String getSegundoApellido() {
+        return segundoApellido;
+    }
 
-    /** Retorna el nombre completo: "Nombre PrimerApellido SegundoApellido". */
+    public void setSegundoApellido(String segundoApellido) {
+        this.segundoApellido = segundoApellido;
+    }
+
     public String getNombreCompleto() {
         return nombre + " " + primerApellido + " " + segundoApellido;
     }
 
-    /** Resume la persona mostrando la cédula y el nombre completo. */
     @Override
     public String toString() {
-        return "Persona{cedula='" + cedula + "', nombre='" + getNombreCompleto() + "'}";
+        return "Persona{" +
+                "cedula='" + cedula + '\'' +
+                ", codElectoral='" + codElectoral + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", primerApellido='" + primerApellido + '\'' +
+                ", segundoApellido='" + segundoApellido + '\'' +
+                '}';
     }
 }

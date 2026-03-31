@@ -11,39 +11,21 @@ package com.padron.dto;
  *   // → FormatoSalida.JSON
  */
 public enum FormatoSalida {
+    JSON,
+    XML;
 
-    JSON("json"),
-    XML("xml");
-
-    private final String codigo;
-
-    /** Asocia cada valor del enum con el texto esperado en la solicitud. */
-    FormatoSalida(String codigo) {
-        this.codigo = codigo;
-    }
-
-    /** Retorna el código textual del formato, por ejemplo "json" o "xml". */
-    public String getCodigo() {
-        return codigo;
-    }
-
-    /**
-     * Convierte un string ("json" o "xml") en el enum correspondiente.
-     *
-     * @param valor  string recibido del cliente (case-insensitive)
-     * @return       el FormatoSalida correspondiente
-     * @throws IllegalArgumentException si el valor no es reconocido
-     */
     public static FormatoSalida fromString(String valor) {
         if (valor == null) {
-            throw new IllegalArgumentException("El formato de salida no puede ser nulo.");
+            return null;
         }
-        for (FormatoSalida f : values()) {
-            if (f.codigo.equalsIgnoreCase(valor.trim())) {
-                return f;
-            }
+
+        switch (valor.toUpperCase()) {
+            case "JSON":
+                return JSON;
+            case "XML":
+                return XML;
+            default:
+                return null;
         }
-        throw new IllegalArgumentException(
-                "Formato desconocido: '" + valor + "'. Use 'json' o 'xml'.");
     }
 }
