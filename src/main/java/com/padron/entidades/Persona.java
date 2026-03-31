@@ -29,6 +29,7 @@ public class Persona {
         // Vacío: requerido para serialización
     }
 
+    /** Crea una persona con sus datos de identidad y ubicación electoral. */
     public Persona(String cedula, String nombre,
                    String primerApellido, String segundoApellido,
                    int codigoProvincia, int codigoCanton, int codigoDistrito) {
@@ -45,24 +46,31 @@ public class Persona {
     // Getters y Setters
     // ---------------------------------------------------------------
 
+    /** Retorna la cédula única de la persona. */
     public String getCedula()            { return cedula; }
     public void   setCedula(String v)    { this.cedula = v; }
 
+    /** Retorna el nombre de pila registrado. */
     public String getNombre()            { return nombre; }
     public void   setNombre(String v)    { this.nombre = v; }
 
+    /** Retorna el primer apellido registrado. */
     public String getPrimerApellido()           { return primerApellido; }
     public void   setPrimerApellido(String v)   { this.primerApellido = v; }
 
+    /** Retorna el segundo apellido registrado. */
     public String getSegundoApellido()          { return segundoApellido; }
     public void   setSegundoApellido(String v)  { this.segundoApellido = v; }
 
+    /** Retorna el código de provincia asociado a la persona. */
     public int  getCodigoProvincia()       { return codigoProvincia; }
     public void setCodigoProvincia(int v)  { this.codigoProvincia = v; }
 
+    /** Retorna el código de cantón asociado a la persona. */
     public int  getCodigoCanton()          { return codigoCanton; }
     public void setCodigoCanton(int v)     { this.codigoCanton = v; }
 
+    /** Retorna el código de distrito asociado a la persona. */
     public int  getCodigoDistrito()        { return codigoDistrito; }
     public void setCodigoDistrito(int v)   { this.codigoDistrito = v; }
 
@@ -75,6 +83,7 @@ public class Persona {
         return nombre + " " + primerApellido + " " + segundoApellido;
     }
 
+    /** Resume la persona mostrando la cédula y el nombre completo. */
     @Override
     public String toString() {
         return "Persona{cedula='" + cedula + "', nombre='" + getNombreCompleto() + "'}";
