@@ -5,66 +5,127 @@ import com.padron.entidades.Persona;
 
 /**
  * DTO que representa la respuesta a una consulta del padrón.
- * Contiene el resultado de la búsqueda y metadatos de la operación.
+ * Contiene tanto los datos exitosos como la información de error.
  *
  * RAMA:  feature/modelo
- * OWNER: Desarrollador 1
- *
- * TODO (feature/modelo):
- *  - Decidir si incluir timestamp en la respuesta
- *  - Considerar un campo "version" para la API
+ * OWNER: Cristian Meléndez
  */
 public class RespuestaPadron {
 
-    private boolean  exito;
-    private String   mensaje;
-    private Persona  persona;
-    private Direccion direccion;
+    private String cedula;
+    private String nombreCompleto;
+    private String provincia;
+    private String canton;
+    private String distrito;
+    private String codigoError;
+    private String mensajeError;
 
-    // ---------------------------------------------------------------
-    // Constructores
-    // ---------------------------------------------------------------
-
+    /** Constructor vacío para serialización o construcción manual. */
     public RespuestaPadron() {
-        // Vacío: requerido para serialización
     }
 
-    /** Respuesta exitosa con datos completos. */
+    /** Constructor para una respuesta exitosa. */
+    public RespuestaPadron(String cedula, String nombreCompleto, String provincia, String canton, String distrito) {
+        this.cedula = cedula;
+        this.nombreCompleto = nombreCompleto;
+        this.provincia = provincia;
+        this.canton = canton;
+        this.distrito = distrito;
+    }
+
+    /** Constructor para una respuesta de error. */
+    public RespuestaPadron(String codigoError, String mensajeError) {
+        this.codigoError = codigoError;
+        this.mensajeError = mensajeError;
+    }
+
+    /** Crea una respuesta exitosa a partir de las entidades principales. */
     public static RespuestaPadron exitosa(Persona persona, Direccion direccion) {
-        RespuestaPadron r = new RespuestaPadron();
-        r.exito     = true;
-        r.mensaje   = "Consulta exitosa.";
-        r.persona   = persona;
-        r.direccion = direccion;
-        return r;
+        return new RespuestaPadron(
+                persona != null ? persona.getCedula() : null,
+                persona != null ? persona.getNombreCompleto() : null,
+                direccion != null ? direccion.getProvincia() : null,
+                direccion != null ? direccion.getCanton() : null,
+                direccion != null ? direccion.getDistrito() : null
+        );
     }
 
-    /** Respuesta de error (cédula no encontrada, formato inválido, etc.). */
-    public static RespuestaPadron error(String motivo) {
-        RespuestaPadron r = new RespuestaPadron();
-        r.exito   = false;
-        r.mensaje = motivo;
-        return r;
+    /** Crea una respuesta de error con código y mensaje. */
+    public static RespuestaPadron error(String codigoError, String mensajeError) {
+        return new RespuestaPadron(codigoError, mensajeError);
     }
 
-    // ---------------------------------------------------------------
-    // Getters y Setters
-    // ---------------------------------------------------------------
+    /** Indica si la respuesta representa un error. */
+    public boolean esError() {
+        return codigoError != null && !codigoError.isBlank();
+    }
 
-    public boolean   isExito()              { return exito; }
-    public void      setExito(boolean v)    { this.exito = v; }
+    public String getCedula() {
+        return cedula;
+    }
 
-    public String    getMensaje()           { return mensaje; }
-    public void      setMensaje(String v)   { this.mensaje = v; }
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
+    }
 
-    public Persona   getPersona()           { return persona; }
-    public void      setPersona(Persona v)  { this.persona = v; }
+    public String getNombreCompleto() {
+        return nombreCompleto;
+    }
 
-    public Direccion getDireccion()               { return direccion; }
-    public void      setDireccion(Direccion v)    { this.direccion = v; }
+    public void setNombreCompleto(String nombreCompleto) {
+        this.nombreCompleto = nombreCompleto;
+    }
+
+    public String getProvincia() {
+        return provincia;
+    }
+
+    public void setProvincia(String provincia) {
+        this.provincia = provincia;
+    }
+
+    public String getCanton() {
+        return canton;
+    }
+
+    public void setCanton(String canton) {
+        this.canton = canton;
+    }
+
+    public String getDistrito() {
+        return distrito;
+    }
+
+    public void setDistrito(String distrito) {
+        this.distrito = distrito;
+    }
+
+    public String getCodigoError() {
+        return codigoError;
+    }
+
+    public void setCodigoError(String codigoError) {
+        this.codigoError = codigoError;
+    }
+
+    public String getMensajeError() {
+        return mensajeError;
+    }
+
+    public void setMensajeError(String mensajeError) {
+        this.mensajeError = mensajeError;
+    }
 
     @Override
     public String toString() {
-        return "RespuestaPadron{exito=" + exito + ", persona=" + persona + "}";
+        return "RespuestaPadron{" +
+                "cedula='" + cedula + '\'' +
+                ", nombreCompleto='" + nombreCompleto + '\'' +
+                ", provincia='" + provincia + '\'' +
+                ", canton='" + canton + '\'' +
+                ", distrito='" + distrito + '\'' +
+                ", codigoError='" + codigoError + '\'' +
+                ", mensajeError='" + mensajeError + '\'' +
+                '}';
     }
 }
