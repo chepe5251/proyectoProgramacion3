@@ -11,88 +11,74 @@ import java.util.Map;
 /**
  * Repositorio que carga y consulta el archivo PADRON.txt.
  *
- * RAMA:  feature/repositorios
- * OWNER: Desarrollador 2
- *
- * Formato esperado de PADRON.txt (una persona por línea):
- *   cedula,nombre,primerApellido,segundoApellido,codigoProvincia,codigoCanton,codigoDistrito
- *
- * TODO (feature/repositorios):
- *  - Implementar cargarDesdeArchivo()
- *  - Implementar buscarPorCedula()
- *  - Manejar líneas malformadas con log de advertencia (no lanzar excepción)
- *  - Considerar si el índice debe ser un HashMap o un TreeMap
+ * Formato esperado (una persona por línea, separado por |):
+ *   cedula|codElectoral|nombre|primerApellido|segundoApellido
  */
 public class RepositorioPadron {
+
+    private static final String DELIMITADOR = "\\|";
 
     /** Índice principal: cédula → Persona. Cargado una sola vez al inicio. */
     private final Map<String, Persona> indice = new HashMap<>();
 
     private final String rutaArchivo;
 
-    // ---------------------------------------------------------------
-    // Constructor
-    // ---------------------------------------------------------------
-
     public RepositorioPadron(String rutaArchivo) {
         this.rutaArchivo = rutaArchivo;
     }
 
-    // ---------------------------------------------------------------
-    // Métodos públicos
-    // ---------------------------------------------------------------
-
     /**
      * Carga el padrón desde el archivo de texto en memoria.
      * Debe llamarse una sola vez al iniciar la aplicación.
-     *
-     * TODO (feature/repositorios): implementar este método.
-     *
-     * @throws IOException si el archivo no existe o no se puede leer
      */
     public void cargarDesdeArchivo() throws IOException {
-        // TODO: abrir BufferedReader sobre rutaArchivo
-        // TODO: parsear cada línea con parsearLinea()
-        // TODO: insertar en indice con cédula como clave
-        throw new UnsupportedOperationException("Pendiente de implementación.");
+        try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
+            String linea;
+            while ((linea = br.readLine()) != null) {
+                Persona p = parsearLinea(linea);
+                if (p != null) {
+                    indice.put(p.getCedula().trim(), p);
+                }
+            }
+        }
+        System.out.println("Padron cargado: " + indice.size() + " personas.");
     }
 
     /**
      * Busca una persona por su número de cédula.
      *
-     * TODO (feature/repositorios): implementar este método.
-     *
-     * @param cedula número de cédula (9 dígitos, sin guiones)
+     * @param cedula número de cédula
      * @return       la Persona encontrada, o null si no existe
      */
     public Persona buscarPorCedula(String cedula) {
-        // TODO: normalizar cédula (trim, quitar guiones)
-        // TODO: retornar indice.get(cedula)
-        throw new UnsupportedOperationException("Pendiente de implementación.");
+        if (cedula == null) return null;
+        return indice.get(cedula.trim());
     }
 
-    /**
-     * Retorna cuántas personas están cargadas en memoria.
-     * Útil para verificar que la carga fue exitosa.
-     */
+    /** Retorna cuántas personas están cargadas en memoria. */
     public int totalPersonas() {
         return indice.size();
     }
 
-    // ---------------------------------------------------------------
-    // Métodos privados de parsing
-    // ---------------------------------------------------------------
-
     /**
      * Parsea una línea de PADRON.txt y retorna una Persona.
-     *
-     * TODO (feature/repositorios): implementar este método.
-     *  - Dividir por coma (o el delimitador real del archivo)
-     *  - Crear y retornar objeto Persona
-     *  - Retornar null si la línea está malformada
+     * Formato: cedula|codElectoral|nombre|primerApellido|segundoApellido
      */
     private Persona parsearLinea(String linea) {
-        // TODO: implementar parsing
-        return null;
+        if (linea == null || linea.isBlank()) return null;
+        String[] partes = linea.split(DELIMITADOR);
+        if (partes.length < 5) return null;
+        try {
+            return new Persona(
+                partes[0].trim(),
+                partes[1].trim(),
+                partes[2].trim(),
+                partes[3].trim(),
+                partes[4].trim()
+            );
+        } catch (Exception e) {
+            System.err.println("Linea malformada (ignorada): " + linea);
+            return null;
+        }
     }
 }
