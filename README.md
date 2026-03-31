@@ -218,10 +218,10 @@ O bien pasarlos como argumentos al ejecutar (ver sección de ejecución arriba).
 
 | Componente              | Estado        | Notas                                          |
 |-------------------------|---------------|------------------------------------------------|
-| Entidades y DTOs        | Completado    | `Persona`, `Direccion`, `FormatoSalida` listos |
+| Entidades y DTOs        | Completado    | `Persona`, `Direccion`, `FormatoSalida`, `SolicitudPadron`, `RespuestaPadron` |
 | Repositorio Padrón      | Pendiente     | `feature/repositorios`                         |
 | Repositorio Distelec    | Pendiente     | `feature/repositorios`                         |
-| Lógica de negocio       | Pendiente     | `feature/logica`                               |
-| Serialización JSON/XML  | Pendiente     | `feature/logica`                               |
+| Lógica de negocio       | En progreso   | `consultarPadron()` parcialmente implementado  |
+| Serialización JSON/XML  | En progreso   | XML implementado, JSON pendiente               |
 | Servidor TCP            | Completado    | puerto 5000                                    |
 | Servidor HTTP           | Completado    | puerto 8080                                    |

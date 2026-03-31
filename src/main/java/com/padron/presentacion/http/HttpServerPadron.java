@@ -136,7 +136,7 @@ public class HttpServerPadron {
             String contentType = solicitud.getFormato() == FormatoSalida.XML
                                ? "application/xml" : "application/json";
             String body        = serializador.serializar(respuesta, solicitud.getFormato());
-            int    status      = respuesta.isExito() ? 200 : 400;
+            int    status      = respuesta.esError() ? 400 : 200;
 
             salida.print(construirRespuestaHttp(status, contentType, body));
             salida.flush();
