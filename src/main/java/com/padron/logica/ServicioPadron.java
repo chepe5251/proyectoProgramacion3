@@ -56,8 +56,18 @@ public class ServicioPadron {
      * @return          respuesta con los datos o mensaje de error
      */
     public RespuestaPadron consultarPadron(SolicitudPadron solicitud) {
-        // TODO: implementar lógica de negocio
-        throw new UnsupportedOperationException("Pendiente de implementación.");
+        if (solicitud == null || !solicitud.esValida()) {
+            return RespuestaPadron.error("400", "Solicitud invalida: cedula y formato son requeridos.");
+        }
+        if (!validarCedula(solicitud.getCedula())) {
+            return RespuestaPadron.error("400", "Cedula invalida: debe contener exactamente 9 digitos.");
+        }
+        Persona persona = repositorioPadron.buscarPorCedula(solicitud.getCedula());
+        if (persona == null) {
+            return RespuestaPadron.error("404", "Cedula no encontrada en el padron.");
+        }
+        Direccion direccion = repositorioDistelec.buscarPorCodElectoral(persona.getCodElectoral());
+        return RespuestaPadron.exitosa(persona, direccion);
     }
 
     // ---------------------------------------------------------------
