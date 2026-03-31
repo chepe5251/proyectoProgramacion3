@@ -16,7 +16,7 @@ import java.util.Map;
  */
 public class RepositorioPadron {
 
-    private static final String DELIMITADOR = "\\|";
+    private static final String DELIMITADOR = ",";
 
     /** Índice principal: cédula → Persona. Cargado una sola vez al inicio. */
     private final Map<String, Persona> indice = new HashMap<>();
@@ -62,19 +62,22 @@ public class RepositorioPadron {
 
     /**
      * Parsea una línea de PADRON.txt y retorna una Persona.
-     * Formato: cedula|codElectoral|nombre|primerApellido|segundoApellido
+     *
+     * Formato TSE (separado por comas):
+     *   [0] cedula      [1] codelec   [2] relleno  [3] fechacaduc
+     *   [4] junta       [5] nombre    [6] primerApellido  [7] segundoApellido
      */
     private Persona parsearLinea(String linea) {
         if (linea == null || linea.isBlank()) return null;
         String[] partes = linea.split(DELIMITADOR);
-        if (partes.length < 5) return null;
+        if (partes.length < 8) return null;
         try {
             return new Persona(
-                partes[0].trim(),
-                partes[1].trim(),
-                partes[2].trim(),
-                partes[3].trim(),
-                partes[4].trim()
+                partes[0].trim(),  // cedula
+                partes[1].trim(),  // codElectoral
+                partes[5].trim(),  // nombre
+                partes[6].trim(),  // primerApellido
+                partes[7].trim()   // segundoApellido
             );
         } catch (Exception e) {
             System.err.println("Linea malformada (ignorada): " + linea);

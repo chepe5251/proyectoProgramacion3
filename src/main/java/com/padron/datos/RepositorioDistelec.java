@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class RepositorioDistelec {
 
-    private static final String DELIMITADOR = "\\|";
+    private static final String DELIMITADOR = ",";
 
     /** Índice: codElectoral → Direccion. */
     private final Map<String, Direccion> indice = new HashMap<>();
@@ -63,7 +63,9 @@ public class RepositorioDistelec {
 
     /**
      * Parsea una línea de distelec.txt y retorna una Direccion.
-     * Formato: codElectoral|provincia|canton|distrito
+     *
+     * Formato TSE (separado por comas):
+     *   [0] codele   [1] provincia   [2] canton   [3] distrito
      */
     private Direccion parsearLinea(String linea) {
         if (linea == null || linea.isBlank()) return null;
