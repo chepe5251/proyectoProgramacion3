@@ -64,8 +64,22 @@ public class Serializador {
      * }
      */
     private String aJson(RespuestaPadron respuesta) {
-        // TODO: implementar con StringBuilder
-        return "{ \"status\": \"success\" }";
+        StringBuilder sb = new StringBuilder();
+        sb.append("{\n");
+        if (respuesta.esError()) {
+            sb.append("  \"exito\": false,\n");
+            sb.append("  \"codigoError\": \"").append(escaparJson(respuesta.getCodigoError())).append("\",\n");
+            sb.append("  \"mensaje\": \"").append(escaparJson(respuesta.getMensajeError())).append("\"\n");
+        } else {
+            sb.append("  \"exito\": true,\n");
+            sb.append("  \"cedula\": \"").append(escaparJson(respuesta.getCedula())).append("\",\n");
+            sb.append("  \"nombre\": \"").append(escaparJson(respuesta.getNombreCompleto())).append("\",\n");
+            sb.append("  \"provincia\": \"").append(escaparJson(respuesta.getProvincia())).append("\",\n");
+            sb.append("  \"canton\": \"").append(escaparJson(respuesta.getCanton())).append("\",\n");
+            sb.append("  \"distrito\": \"").append(escaparJson(respuesta.getDistrito())).append("\"\n");
+        }
+        sb.append("}");
+        return sb.toString();
     }
 
     /**
@@ -88,8 +102,23 @@ public class Serializador {
      * </respuesta>
      */
     private String aXml(RespuestaPadron respuesta) {
-        // TODO: implementar con StringBuilder
-        return "<status>success</status>";
+        StringBuilder sb = new StringBuilder();
+        sb.append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
+        sb.append("<respuesta>\n");
+        if (respuesta.esError()) {
+            sb.append("  <exito>false</exito>\n");
+            sb.append("  <codigoError>").append(respuesta.getCodigoError()).append("</codigoError>\n");
+            sb.append("  <mensaje>").append(respuesta.getMensajeError()).append("</mensaje>\n");
+        } else {
+            sb.append("  <exito>true</exito>\n");
+            sb.append("  <cedula>").append(respuesta.getCedula()).append("</cedula>\n");
+            sb.append("  <nombre>").append(respuesta.getNombreCompleto()).append("</nombre>\n");
+            sb.append("  <provincia>").append(respuesta.getProvincia()).append("</provincia>\n");
+            sb.append("  <canton>").append(respuesta.getCanton()).append("</canton>\n");
+            sb.append("  <distrito>").append(respuesta.getDistrito()).append("</distrito>\n");
+        }
+        sb.append("</respuesta>");
+        return sb.toString();
     }
 
     // ---------------------------------------------------------------
