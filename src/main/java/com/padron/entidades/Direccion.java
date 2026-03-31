@@ -5,11 +5,7 @@ package com.padron.entidades;
  * Los códigos de provincia, cantón y distrito se resuelven contra distelec.txt.
  *
  * RAMA:  feature/modelo
- * OWNER: Desarrollador 1
- *
- * TODO (feature/modelo):
- *  - Agregar equals() y hashCode() basados en los tres códigos
- *  - Considerar si necesitamos código de junta receptora
+ * OWNER: Cristian Meléndez
  */
 public class Direccion {
 
@@ -18,9 +14,11 @@ public class Direccion {
     private String canton;
     private String distrito;
 
+    /** Constructor vacío para uso flexible del modelo. */
     public Direccion() {
     }
 
+    /** Crea una dirección con la información geográfica asociada al código electoral. */
     public Direccion(String codElectoral, String provincia, String canton, String distrito) {
         this.codElectoral = codElectoral;
         this.provincia = provincia;
@@ -60,13 +58,30 @@ public class Direccion {
         this.distrito = distrito;
     }
 
+    /** Retorna la dirección lista para mostrar en texto. */
+    public String getDireccionCompleta() {
+        StringBuilder direccionCompleta = new StringBuilder();
+
+        if (provincia != null && !provincia.isBlank()) {
+            direccionCompleta.append(provincia.trim());
+        }
+        if (canton != null && !canton.isBlank()) {
+            if (direccionCompleta.length() > 0) direccionCompleta.append(", ");
+            direccionCompleta.append(canton.trim());
+        }
+        if (distrito != null && !distrito.isBlank()) {
+            if (direccionCompleta.length() > 0) direccionCompleta.append(", ");
+            direccionCompleta.append(distrito.trim());
+        }
+
+        return direccionCompleta.toString();
+    }
+
     @Override
     public String toString() {
         return "Direccion{" +
                 "codElectoral='" + codElectoral + '\'' +
-                ", provincia='" + provincia + '\'' +
-                ", canton='" + canton + '\'' +
-                ", distrito='" + distrito + '\'' +
+                ", direccionCompleta='" + getDireccionCompleta() + '\'' +
                 '}';
     }
 }
