@@ -40,27 +40,38 @@ public class Main {
         RepositorioPadron   repoPadron   = new RepositorioPadron(rutaPadron);
         RepositorioDistelec repoDistelec = new RepositorioDistelec(rutaDistelec);
 
-        // TODO: descomentar cuando feature/repositorios esté mergeado
-        // repoPadron.cargarDesdeArchivo();
-        // repoDistelec.cargarDesdeArchivo();
-        // System.out.println("Padron cargado: " + repoPadron.totalPersonas() + " personas.");
+        repoPadron.cargarDesdeArchivo();
+        repoDistelec.cargarDesdeArchivo();
 
         // 2. Construir capa de lógica
         ServicioPadron servicio     = new ServicioPadron(repoPadron, repoDistelec);
         Serializador   serializador = new Serializador();
 
-        // 3. Iniciar servidores
-        // TODO: descomentar cuando feature/tcp y feature/http estén mergeados
-        // TcpServer tcpServer = new TcpServer(PUERTO_TCP, servicio, serializador);
-        // HttpServerPadron httpServer = new HttpServerPadron(PUERTO_HTTP, servicio, serializador);
+        // 3. Iniciar servidores en threads separados
+        TcpServer        tcpServer  = new TcpServer(PUERTO_TCP, servicio, serializador);
+        HttpServerPadron httpServer = new HttpServerPadron(PUERTO_HTTP, servicio, serializador);
 
-        // Thread hiloTcp  = new Thread(tcpServer::iniciar);
-        // Thread hiloHttp = new Thread(httpServer::iniciar);
-        // hiloTcp.start();
-        // hiloHttp.start();
+        Thread hiloTcp  = new Thread(() -> {
+            try { tcpServer.iniciar(); }
+            catch (Exception e) { System.err.println("Error TCP: " + e.getMessage()); }
+        });
+        Thread hiloHttp = new Thread(() -> {
+            try { httpServer.iniciar(); }
+            catch (Exception e) { System.err.println("Error HTTP: " + e.getMessage()); }
+        });
 
-        System.out.println("Servidor TCP  escuchando en puerto: " + PUERTO_TCP  + "  [PENDIENTE]");
-        System.out.println("Servidor HTTP escuchando en puerto: " + PUERTO_HTTP + "  [PENDIENTE]");
-        System.out.println("El proyecto compila correctamente. Implementaciones pendientes en cada feature.");
+        // 4. Apagado limpio al detener el proceso (Ctrl+C)
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            System.out.println("\nApagando servidores...");
+            tcpServer.detener();
+            httpServer.detener();
+        }));
+
+        hiloTcp.start();
+        hiloHttp.start();
+
+        System.out.println("Servidor TCP  listo en puerto: " + PUERTO_TCP);
+        System.out.println("Servidor HTTP listo en puerto: " + PUERTO_HTTP);
+        System.out.println("Presiona Ctrl+C para detener.");
     }
 }
