@@ -9,15 +9,24 @@ disponible a través de interfaces TCP y HTTP con respuesta en JSON o XML.
 
 ```
 src/main/java/com/padron/
-├── entidades/          Clases del dominio: Persona, Direccion
-├── dto/                Objetos de transferencia: SolicitudPadron, RespuestaPadron, FormatoSalida
-├── datos/              Repositorios: lectura de PADRON.txt y distelec.txt
-├── logica/             Lógica de negocio: ServicioPadron
-├── util/               Herramientas transversales: Serializador (JSON/XML)
+├── entidades/
+│   ├── Persona.java        cedula, codElectoral, nombre, primerApellido, segundoApellido
+│   └── Direccion.java      codElectoral, provincia, canton, distrito
+├── dto/
+│   ├── FormatoSalida.java  enum JSON | XML
+│   ├── SolicitudPadron.java
+│   └── RespuestaPadron.java
+├── datos/
+│   ├── RepositorioPadron.java    carga y búsqueda en PADRON.txt
+│   └── RepositorioDistelec.java  carga y búsqueda en distelec.txt
+├── logica/
+│   └── ServicioPadron.java       orquesta repositorios y produce RespuestaPadron
+├── util/
+│   └── Serializador.java         convierte RespuestaPadron a JSON o XML
 ├── presentacion/
-│   ├── tcp/            Servidor TCP: TcpServer
-│   └── http/           Servidor HTTP: HttpServerPadron
-└── Main.java           Punto de entrada
+│   ├── tcp/   TcpServer.java     escucha en puerto 5000
+│   └── http/  HttpServerPadron.java  escucha en puerto 8080
+└── Main.java                     punto de entrada
 
 src/main/resources/data/
 └── (colocar aquí PADRON.txt y distelec.txt — no van en el repo)
@@ -207,12 +216,12 @@ O bien pasarlos como argumentos al ejecutar (ver sección de ejecución arriba).
 
 ## Estado del proyecto
 
-| Componente              | Estado        | Rama                    |
-|-------------------------|---------------|-------------------------|
-| Entidades y DTOs        | En progreso   | `feature/modelo`        |
-| Repositorio Padrón      | Pendiente     | `feature/repositorios`  |
-| Repositorio Distelec    | Pendiente     | `feature/repositorios`  |
-| Lógica de negocio       | Pendiente     | `feature/logica`        |
-| Serialización JSON/XML  | Pendiente     | `feature/logica`        |
-| Servidor TCP            | Completado    | mergeado en `main`      |
-| Servidor HTTP           | Completado    | mergeado en `main`      |
+| Componente              | Estado        | Notas                                          |
+|-------------------------|---------------|------------------------------------------------|
+| Entidades y DTOs        | Completado    | `Persona`, `Direccion`, `FormatoSalida` listos |
+| Repositorio Padrón      | Pendiente     | `feature/repositorios`                         |
+| Repositorio Distelec    | Pendiente     | `feature/repositorios`                         |
+| Lógica de negocio       | Pendiente     | `feature/logica`                               |
+| Serialización JSON/XML  | Pendiente     | `feature/logica`                               |
+| Servidor TCP            | Completado    | puerto 5000                                    |
+| Servidor HTTP           | Completado    | puerto 8080                                    |
