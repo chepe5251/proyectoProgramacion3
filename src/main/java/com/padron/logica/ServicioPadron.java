@@ -75,7 +75,10 @@ public class ServicioPadron {
      * @return true si la cédula es válida
      */
     private boolean validarCedula(String cedula) {
-        // TODO: implementar
-        return false;
+       if (cedula == null || cedula.trim().isEmpty()) {
+            return false;
+        }
+        // Debe tener exactamente 9 dígitos y ser solo números
+        return cedula.matches("\\d{9}");
     }
 }
