@@ -46,8 +46,8 @@ desktop.ini
 # Archivos de datos (sensibles / grandes)
 # Cada desarrollador los coloca en resources/data/ localmente.
 # ===========================
-resources/data/PADRON.txt
-resources/data/distelec.txt
+src/main/resources/data/PADRON.txt
+src/main/resources/data/distelec.txt
 
 # ===========================
 # Configuración local (puertos, paths personales)

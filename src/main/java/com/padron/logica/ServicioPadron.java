@@ -11,16 +11,8 @@ import com.padron.entidades.Persona;
  * Servicio central de negocio del sistema.
  * Coordina los repositorios y produce una RespuestaPadron.
  *
- * RAMA:  feature/logica
- * OWNER: Desarrollador 3
- *
  * Esta clase NO sabe nada de TCP, HTTP, JSON ni XML.
  * Esa responsabilidad es de las capas de presentación y util.
- *
- * TODO (feature/logica):
- *  - Implementar consultarPadron()
- *  - Implementar validarCedula()
- *  - Agregar logging básico (System.out o java.util.logging)
  */
 public class ServicioPadron {
 
@@ -43,14 +35,6 @@ public class ServicioPadron {
 
     /**
      * Procesa una solicitud de consulta al padrón.
-     *
-     * TODO (feature/logica): implementar este método.
-     *  Pasos sugeridos:
-     *  1. Validar la solicitud (cedula no vacía, formato reconocido)
-     *  2. Buscar la persona en RepositorioPadron
-     *  3. Si no existe → retornar RespuestaPadron.error("Cédula no encontrada.")
-     *  4. Resolver la dirección con RepositorioDistelec
-     *  5. Retornar RespuestaPadron.exitosa(persona, direccion)
      *
      * @param solicitud datos de la consulta
      * @return          respuesta con los datos o mensaje de error
@@ -75,12 +59,7 @@ public class ServicioPadron {
     // ---------------------------------------------------------------
 
     /**
-     * Valida que la cédula tenga el formato correcto.
-     *
-     * TODO (feature/logica): implementar validación.
-     *  - No nula, no vacía
-     *  - Solo dígitos
-     *  - Exactamente 9 caracteres
+     * Valida que la cédula tenga exactamente 9 dígitos.
      *
      * @return true si la cédula es válida
      */

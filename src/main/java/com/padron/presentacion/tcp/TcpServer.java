@@ -16,19 +16,9 @@ import java.net.Socket;
 /**
  * Servidor TCP que escucha solicitudes de consulta al padrón.
  *
- * RAMA:  feature/tcp
- * OWNER: Desarrollador 4
- *
- * Protocolo esperado (texto plano por socket):
+ * Protocolo (texto plano por socket):
  *   Solicitud del cliente:  "cedula=109870456&formato=json\n"
  *   Respuesta del servidor: JSON o XML según formato pedido
- *
- * TODO (feature/tcp):
- *  - Implementar iniciar()
- *  - Implementar manejarCliente() en un Thread separado
- *  - Implementar parsearSolicitud() para leer el texto del socket
- *  - Implementar detener() para cerrar el ServerSocket limpiamente
- *  - Agregar timeout de lectura por socket (evitar clientes colgados)
  */
 public class TcpServer {
 
@@ -56,11 +46,6 @@ public class TcpServer {
     /**
      * Inicia el servidor TCP y entra al loop de aceptar conexiones.
      *
-     * TODO (feature/tcp): implementar este método.
-     *  1. Crear ServerSocket en el puerto configurado
-     *  2. Loop: aceptar Socket → lanzar Thread → manejarCliente()
-     *  3. Capturar IOException cuando corriendo=false (cierre limpio)
-     *
      * @throws IOException si no se puede abrir el puerto
      */
     public void iniciar() throws IOException {
@@ -80,8 +65,6 @@ public class TcpServer {
 
     /**
      * Detiene el servidor cerrando el ServerSocket.
-     *
-     * TODO (feature/tcp): implementar este método.
      */
     public void detener() {
         corriendo = false;
@@ -95,15 +78,7 @@ public class TcpServer {
     // ---------------------------------------------------------------
 
     /**
-     * Maneja una conexión individual de un cliente.
-     * Debe ejecutarse en su propio Thread.
-     *
-     * TODO (feature/tcp): implementar este método.
-     *  1. Leer línea del socket (BufferedReader)
-     *  2. Parsear con parsearSolicitud()
-     *  3. Llamar servicio.consultarPadron()
-     *  4. Serializar y escribir respuesta al socket (PrintWriter)
-     *  5. Cerrar socket al terminar
+     * Maneja una conexión individual de un cliente en su propio Thread.
      *
      * @param cliente socket del cliente conectado
      */
@@ -126,9 +101,7 @@ public class TcpServer {
 
     /**
      * Parsea la línea de texto recibida por TCP en una SolicitudPadron.
-     *
-     * TODO (feature/tcp): implementar este método.
-     *  Formato: "cedula=XXXXXXXXX&formato=json"
+     * Formato: "cedula=XXXXXXXXX&formato=json"
      *
      * @param lineaTexto línea recibida del cliente
      * @return           SolicitudPadron con los campos extraídos

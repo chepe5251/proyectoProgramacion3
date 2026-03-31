@@ -16,25 +16,8 @@ import java.net.Socket;
 /**
  * Servidor HTTP mínimo (raw sockets) para consultas al padrón.
  *
- * RAMA:  feature/http
- * OWNER: Desarrollador 4
- *
- * Endpoint esperado:
- *   GET /padron?cedula=109870456&formato=json HTTP/1.1
- *
- * Respuesta:
- *   HTTP/1.1 200 OK
- *   Content-Type: application/json
- *   <CUERPO JSON o XML>
- *
- * TODO (feature/http):
- *  - Implementar iniciar()
- *  - Implementar manejarCliente() que parsee la request HTTP
- *  - Implementar parsearParametros() para extraer query params
- *  - Implementar construirRespuestaHttp() con headers correctos
- *  - Retornar 400 Bad Request si faltan parámetros
- *  - Retornar 404 Not Found si la cédula no existe
- *  - Retornar 500 Internal Server Error en caso de excepción
+ * Endpoint: GET /padron?cedula=109870456&formato=json HTTP/1.1
+ * Respuesta: HTTP/1.1 200 OK con Content-Type application/json o application/xml
  */
 public class HttpServerPadron {
 
@@ -61,10 +44,6 @@ public class HttpServerPadron {
 
     /**
      * Inicia el servidor HTTP y entra al loop de aceptar conexiones.
-     *
-     * TODO (feature/http): implementar este método.
-     *  1. Crear ServerSocket en el puerto configurado
-     *  2. Loop: aceptar Socket → lanzar Thread → manejarCliente()
      *
      * @throws IOException si no se puede abrir el puerto
      */
@@ -98,15 +77,7 @@ public class HttpServerPadron {
     // ---------------------------------------------------------------
 
     /**
-     * Lee y responde una request HTTP desde el socket.
-     * Debe ejecutarse en su propio Thread.
-     *
-     * TODO (feature/http): implementar este método.
-     *  1. Leer la primera línea: "GET /padron?... HTTP/1.1"
-     *  2. Leer headers hasta línea vacía (obligatorio en HTTP)
-     *  3. Extraer query string y parsear parámetros
-     *  4. Llamar servicio.consultarPadron()
-     *  5. Escribir respuesta HTTP completa (status line + headers + body)
+     * Lee y responde una request HTTP desde el socket en su propio Thread.
      *
      * @param cliente socket del cliente conectado
      */
@@ -150,10 +121,6 @@ public class HttpServerPadron {
     /**
      * Extrae los parámetros de la query string de una URL.
      *
-     * TODO (feature/http): implementar este método.
-     *  Ejemplo: "/padron?cedula=109870456&formato=xml"
-     *           → cedula="109870456", formato="xml"
-     *
      * @param queryString la parte "cedula=...&formato=..." de la URL
      * @return            SolicitudPadron con los parámetros extraídos
      */
@@ -176,11 +143,6 @@ public class HttpServerPadron {
 
     /**
      * Construye una respuesta HTTP completa como String.
-     *
-     * TODO (feature/http): implementar este método.
-     *  - statusCode: 200, 400, 404, 500
-     *  - contentType: "application/json" o "application/xml"
-     *  - body: el JSON o XML serializado
      */
     private String construirRespuestaHttp(int statusCode, String contentType, String body) {
         String statusText = statusCode == 200 ? "OK"

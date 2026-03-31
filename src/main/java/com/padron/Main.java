@@ -10,13 +10,6 @@ import com.padron.util.Serializador;
 /**
  * Punto de entrada principal de la aplicación.
  *
- * RAMA:  main / feature/integracion (último en mergearse)
- * OWNER: Líder del equipo o Desarrollador 1
- *
- * TODO (integración final):
- *  - Leer puertos y rutas de archivos desde build.properties o args[]
- *  - Iniciar TCP y HTTP en threads separados
- *  - Agregar shutdown hook para detener servidores limpiamente
  */
 public class Main {
 

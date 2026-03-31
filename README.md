@@ -202,26 +202,46 @@ Si dos personas necesitan el mismo archivo, coordinarlo antes de hacer cambios.
 
 ## Colocar los archivos de datos
 
-Los archivos `PADRON.txt` y `distelec.txt` NO están en el repositorio (ver `.gitignore`).
-Cada desarrollador debe obtenerlos del docente y colocarlos en:
+Los archivos `PADRON.txt` y `distelec.txt` **no están en el repositorio** (superan el límite de GitHub o son datos sensibles). Cada desarrollador debe descargarlos del TSE y colocarlos manualmente.
+
+### Dónde descargar
+
+1. Ir a [https://www.tse.go.cr](https://www.tse.go.cr)
+2. Navegar a **Servicios → Padrón Electoral → Descarga del Padrón**
+3. Descargar:
+   - **PADRON_COMPLETO.zip** — padrón con todos los electores (~193 MB descomprimido)
+   - **distelec.zip** — catálogo de distritos electorales (~172 KB descomprimido)
+
+### Qué hacer con los archivos descargados
+
+1. Descomprimir ambos ZIP.
+2. Renombrar el archivo del padrón a `PADRON.txt` si viene con otro nombre (p. ej. `PADRON_COMPLETO.txt`).
+3. Colocarlos en:
 
 ```
 src/main/resources/data/PADRON.txt
 src/main/resources/data/distelec.txt
 ```
 
-O bien pasarlos como argumentos al ejecutar (ver sección de ejecución arriba).
+### Formato esperado
+
+| Archivo        | Separador | Campos (en orden)                                                          |
+|----------------|-----------|----------------------------------------------------------------------------|
+| `PADRON.txt`   | coma `,`  | cedula, codelec, fechacaduc, nombre, primerApellido, segundoApellido       |
+| `distelec.txt` | coma `,`  | codele, provincia, canton, distrito                                         |
+
+O bien pasar las rutas como argumentos al ejecutar (ver sección de ejecución arriba).
 
 ---
 
 ## Estado del proyecto
 
-| Componente              | Estado        | Notas                                          |
-|-------------------------|---------------|------------------------------------------------|
-| Entidades y DTOs        | Completado    | `Persona`, `Direccion`, `FormatoSalida`, `SolicitudPadron`, `RespuestaPadron` |
-| Repositorio Padrón      | Pendiente     | `feature/repositorios`                         |
-| Repositorio Distelec    | Pendiente     | `feature/repositorios`                         |
-| Lógica de negocio       | En progreso   | `consultarPadron()` parcialmente implementado  |
-| Serialización JSON/XML  | En progreso   | XML implementado, JSON pendiente               |
-| Servidor TCP            | Completado    | puerto 5000                                    |
-| Servidor HTTP           | Completado    | puerto 8080                                    |
+| Componente              | Estado     | Notas                                                                      |
+|-------------------------|------------|----------------------------------------------------------------------------|
+| Entidades y DTOs        | Completado | `Persona`, `Direccion`, `FormatoSalida`, `SolicitudPadron`, `RespuestaPadron` |
+| Repositorio Padrón      | Completado | carga 3 740 286 personas desde PADRON.txt                                  |
+| Repositorio Distelec    | Completado | carga 2 179 distritos desde distelec.txt                                   |
+| Lógica de negocio       | Completado | `consultarPadron()` y `validarCedula()` implementados                      |
+| Serialización JSON/XML  | Completado | JSON y XML generados manualmente con StringBuilder                         |
+| Servidor TCP            | Completado | puerto 5000                                                                |
+| Servidor HTTP           | Completado | puerto 8080                                                                |
