@@ -401,3 +401,30 @@ Cambios incorporados para alinear el proyecto con la rÃºbrica:
 - soporte del alias `format` ademÃ¡s de `formato`
 - pruebas JUnit en `src/test/java`
 - informe tÃ©cnico adicional en `INFORME_TECNICO.md`
+
+### HTTP adicional
+
+Endpoint por ruta:
+
+```bash
+curl "http://localhost:8080/padron/109870456?format=xml"
+```
+
+MÃ©todo no permitido:
+
+```bash
+curl -X POST "http://localhost:8080/padron?cedula=109870456"
+```
+
+Respuesta esperada:
+
+```http
+HTTP/1.1 405 Method Not Allowed
+Content-Type: application/json; charset=UTF-8
+
+{
+  "exito": false,
+  "codigoError": "405",
+  "mensaje": "Metodo no permitido. Use GET."
+}
+```

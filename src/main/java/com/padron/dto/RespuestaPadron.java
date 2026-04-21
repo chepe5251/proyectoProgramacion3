@@ -4,15 +4,16 @@ import com.padron.entidades.Direccion;
 import com.padron.entidades.Persona;
 
 /**
- * DTO que representa la respuesta a una consulta del padrón.
- * Contiene tanto los datos exitosos como la información de error.
+ * DTO que representa la respuesta a una consulta del padrÃ³n.
+ * Contiene tanto los datos exitosos como la informaciÃ³n de error.
  *
  * RAMA:  feature/modelo
- * OWNER: Cristian Meléndez
+ * OWNER: Cristian MelÃ©ndez
  */
 public class RespuestaPadron {
 
     private String cedula;
+    private String nombre;
     private String primerApellido;
     private String segundoApellido;
     private String nombreCompleto;
@@ -22,13 +23,15 @@ public class RespuestaPadron {
     private String codigoError;
     private String mensajeError;
 
-    /** Constructor vacío para serialización o construcción manual. */
+    /** Constructor vacÃ­o para serializaciÃ³n o construcciÃ³n manual. */
     public RespuestaPadron() {
     }
 
-    public RespuestaPadron(String cedula, String primerApellido, String segundoApellido,
+    /** Constructor para una respuesta exitosa. */
+    public RespuestaPadron(String cedula, String nombre, String primerApellido, String segundoApellido,
                            String nombreCompleto, String provincia, String canton, String distrito) {
         this.cedula = cedula;
+        this.nombre = nombre;
         this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
         this.nombreCompleto = nombreCompleto;
@@ -57,7 +60,7 @@ public class RespuestaPadron {
         );
     }
 
-    /** Crea una respuesta de error con código y mensaje. */
+    /** Crea una respuesta de error con cÃ³digo y mensaje. */
     public static RespuestaPadron error(String codigoError, String mensajeError) {
         return new RespuestaPadron(codigoError, mensajeError);
     }
