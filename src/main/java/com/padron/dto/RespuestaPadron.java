@@ -13,7 +13,6 @@ import com.padron.entidades.Persona;
 public class RespuestaPadron {
 
     private String cedula;
-    private String nombre;
     private String primerApellido;
     private String segundoApellido;
     private String nombreCompleto;
@@ -27,11 +26,9 @@ public class RespuestaPadron {
     public RespuestaPadron() {
     }
 
-    /** Constructor para una respuesta exitosa. */
-    public RespuestaPadron(String cedula, String nombre, String primerApellido, String segundoApellido,
+    public RespuestaPadron(String cedula, String primerApellido, String segundoApellido,
                            String nombreCompleto, String provincia, String canton, String distrito) {
         this.cedula = cedula;
-        this.nombre = nombre;
         this.primerApellido = primerApellido;
         this.segundoApellido = segundoApellido;
         this.nombreCompleto = nombreCompleto;
