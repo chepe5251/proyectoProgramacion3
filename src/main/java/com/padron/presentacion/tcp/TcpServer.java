@@ -12,19 +12,24 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Servidor TCP que escucha solicitudes de consulta al padrón.
  *
  * Protocolo (texto plano por socket):
- *   Solicitud del cliente:  "cedula=109870456&formato=json\n"
+ *   Solicitud del cliente:  "GET|109870456|json\n"
  *   Respuesta del servidor: JSON o XML según formato pedido
  */
 public class TcpServer {
+    private static final int TAMANO_POOL = 20;
 
     private final int            puerto;
     private final ServicioPadron servicio;
     private final Serializador   serializador;
+    private final ExecutorService poolClientes;
 
     private ServerSocket serverSocket;
     private boolean      corriendo = false;
@@ -37,6 +42,7 @@ public class TcpServer {
         this.puerto       = puerto;
         this.servicio     = servicio;
         this.serializador = serializador;
+        this.poolClientes = Executors.newFixedThreadPool(TAMANO_POOL);
     }
 
     // ---------------------------------------------------------------
@@ -55,7 +61,7 @@ public class TcpServer {
         while (corriendo) {
             try {
                 Socket cliente = serverSocket.accept();
-                new Thread(() -> manejarCliente(cliente)).start();
+                poolClientes.submit(() -> manejarCliente(cliente));
             } catch (IOException e) {
                 if (!corriendo) break;
                 System.err.println("Error aceptando conexion TCP: " + e.getMessage());
@@ -70,6 +76,15 @@ public class TcpServer {
         corriendo = false;
         if (serverSocket != null && !serverSocket.isClosed()) {
             try { serverSocket.close(); } catch (IOException ignored) {}
+        }
+        poolClientes.shutdown();
+        try {
+            if (!poolClientes.awaitTermination(5, TimeUnit.SECONDS)) {
+                poolClientes.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            poolClientes.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -101,7 +116,7 @@ public class TcpServer {
 
     /**
      * Parsea la línea de texto recibida por TCP en una SolicitudPadron.
-     * Formato: "cedula=XXXXXXXXX&formato=json"
+     * Formato esperado: "GET|XXXXXXXXX|json"
      *
      * @param lineaTexto línea recibida del cliente
      * @return           SolicitudPadron con los campos extraídos
@@ -109,14 +124,35 @@ public class TcpServer {
     private SolicitudPadron parsearSolicitud(String lineaTexto) {
         SolicitudPadron solicitud = new SolicitudPadron();
         if (lineaTexto == null || lineaTexto.isBlank()) return solicitud;
-        for (String par : lineaTexto.trim().split("&")) {
+
+        String lineaNormalizada = lineaTexto.trim();
+        String[] partes = lineaNormalizada.split("\\|", 3);
+        if (partes.length == 3 && "GET".equalsIgnoreCase(partes[0].trim())) {
+            solicitud.setCedula(partes[1].trim());
+
+            FormatoSalida formato = FormatoSalida.fromString(partes[2].trim());
+            if (formato != null) {
+                solicitud.setFormato(formato);
+            }
+            return solicitud;
+        }
+
+        return parsearSolicitudLegacy(lineaNormalizada, solicitud);
+    }
+
+    private SolicitudPadron parsearSolicitudLegacy(String lineaTexto, SolicitudPadron solicitud) {
+        for (String par : lineaTexto.split("&")) {
             String[] kv = par.split("=", 2);
             if (kv.length < 2) continue;
             switch (kv[0].trim()) {
-                case "cedula":  solicitud.setCedula(kv[1].trim()); break;
+                case "cedula":
+                    solicitud.setCedula(kv[1].trim());
+                    break;
                 case "formato":
-                    try { solicitud.setFormato(FormatoSalida.fromString(kv[1].trim())); }
-                    catch (IllegalArgumentException e) { /* mantener default JSON */ }
+                    FormatoSalida formato = FormatoSalida.fromString(kv[1].trim());
+                    if (formato != null) {
+                        solicitud.setFormato(formato);
+                    }
                     break;
             }
         }

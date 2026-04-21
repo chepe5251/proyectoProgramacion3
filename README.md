@@ -86,19 +86,21 @@ Detener con `Ctrl+C` (cierre limpio de ambos servidores).
 
 El servidor TCP escucha en el **puerto 5000** usando sockets Java puros (sin frameworks).
 El protocolo es de texto plano, una línea por solicitud.
+Cada conexión entrante se procesa con un `ExecutorService` de tamaño fijo.
 
 ### Formato de solicitud
 
 ```
-cedula=<CEDULA>&formato=<FORMATO>\n
+GET|<CEDULA>|<FORMATO>\n
 ```
 
-| Campo    | Requerido | Valores           | Default |
-|----------|-----------|-------------------|---------|
-| `cedula` | Sí        | Exactamente 9 dígitos | —   |
-| `formato`| No        | `json` o `xml`    | `json`  |
+| Posición | Requerido | Valores               |
+|----------|-----------|-----------------------|
+| `GET`    | Sí        | Literal `GET`         |
+| `cedula` | Sí        | Exactamente 9 dígitos |
+| `formato`| Sí        | `json` o `xml`        |
 
-- Los parámetros se separan con `&` y se parsean como pares `clave=valor`.
+- Los campos se separan con `|`.
 - La línea debe terminar en `\n` (o `\r\n`).
 - La conexión se cierra automáticamente tras la respuesta.
 
@@ -112,8 +114,8 @@ No hay cabeceras ni envoltura adicional.
 ```
 Cliente                        Servidor TCP :5000
   |  ----  conectar TCP  ---->  |
-  |  ---- "cedula=109870456    |
-  |         &formato=json\n" -> |
+  |  ---- "GET|109870456      |
+  |         |json\n" --------> |
   |  <---  {JSON o XML}\n  ----  |
   |  <---  [conexión cerrada] -- |
 ```
@@ -129,6 +131,7 @@ pero con `"exito": false` y un campo `"mensaje"` descriptivo.
 
 El servidor HTTP escucha en el **puerto 8080** usando sockets Java puros.
 Implementa un subconjunto mínimo de HTTP/1.1 (solo `GET`).
+Cada conexión entrante se procesa con un `ExecutorService` de tamaño fijo.
 
 ### `GET /padron`
 
@@ -157,7 +160,7 @@ Consulta una persona en el padrón por su número de cédula.
 
 **Request** (enviar por socket al puerto 5000):
 ```
-cedula=109870456&formato=json
+GET|109870456|json
 ```
 
 **Response:**
@@ -181,7 +184,7 @@ cedula=109870456&formato=json
 
 **Request:**
 ```
-cedula=109870456&formato=xml
+GET|109870456|xml
 ```
 
 **Response:**
@@ -206,7 +209,7 @@ cedula=109870456&formato=xml
 
 **Request:**
 ```
-cedula=000000001&formato=json
+GET|000000001|json
 ```
 
 **Response:**
@@ -224,7 +227,7 @@ cedula=000000001&formato=json
 
 **Request:**
 ```
-cedula=12345&formato=json
+GET|12345|json
 ```
 
 **Response:**

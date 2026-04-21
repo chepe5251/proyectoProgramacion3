@@ -12,6 +12,10 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Servidor HTTP mínimo (raw sockets) para consultas al padrón.
@@ -20,10 +24,12 @@ import java.net.Socket;
  * Respuesta: HTTP/1.1 200 OK con Content-Type application/json o application/xml
  */
 public class HttpServerPadron {
+    private static final int TAMANO_POOL = 20;
 
     private final int            puerto;
     private final ServicioPadron servicio;
     private final Serializador   serializador;
+    private final ExecutorService poolClientes;
 
     private ServerSocket serverSocket;
     private boolean      corriendo = false;
@@ -36,6 +42,7 @@ public class HttpServerPadron {
         this.puerto       = puerto;
         this.servicio     = servicio;
         this.serializador = serializador;
+        this.poolClientes = Executors.newFixedThreadPool(TAMANO_POOL);
     }
 
     // ---------------------------------------------------------------
@@ -54,7 +61,7 @@ public class HttpServerPadron {
         while (corriendo) {
             try {
                 Socket cliente = serverSocket.accept();
-                new Thread(() -> manejarCliente(cliente)).start();
+                poolClientes.submit(() -> manejarCliente(cliente));
             } catch (IOException e) {
                 if (!corriendo) break;
                 System.err.println("Error aceptando conexion HTTP: " + e.getMessage());
@@ -69,6 +76,15 @@ public class HttpServerPadron {
         corriendo = false;
         if (serverSocket != null && !serverSocket.isClosed()) {
             try { serverSocket.close(); } catch (IOException ignored) {}
+        }
+        poolClientes.shutdown();
+        try {
+            if (!poolClientes.awaitTermination(5, TimeUnit.SECONDS)) {
+                poolClientes.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            poolClientes.shutdownNow();
+            Thread.currentThread().interrupt();
         }
     }
 
@@ -107,7 +123,7 @@ public class HttpServerPadron {
             String contentType = solicitud.getFormato() == FormatoSalida.XML
                                ? "application/xml" : "application/json";
             String body        = serializador.serializar(respuesta, solicitud.getFormato());
-            int    status      = respuesta.esError() ? 400 : 200;
+            int    status      = obtenerStatusHttp(respuesta);
 
             salida.print(construirRespuestaHttp(status, contentType, body));
             salida.flush();
@@ -151,10 +167,22 @@ public class HttpServerPadron {
                           : "Internal Server Error";
         return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n"
              + "Content-Type: " + contentType + "; charset=UTF-8\r\n"
-             + "Content-Length: " + body.getBytes().length + "\r\n"
+             + "Content-Length: " + body.getBytes(StandardCharsets.UTF_8).length + "\r\n"
              + "Connection: close\r\n"
              + "\r\n"
              + body;
+    }
+
+    private int obtenerStatusHttp(RespuestaPadron respuesta) {
+        if (!respuesta.esError()) {
+            return 200;
+        }
+
+        try {
+            return Integer.parseInt(respuesta.getCodigoError());
+        } catch (NumberFormatException e) {
+            return 400;
+        }
     }
 
     // ---------------------------------------------------------------

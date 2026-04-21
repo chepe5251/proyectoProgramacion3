@@ -69,18 +69,18 @@ public class Serializador {
         sb.append("<respuesta>\n");
         if (respuesta.esError()) {
             sb.append("  <exito>false</exito>\n");
-            sb.append("  <codigoError>").append(respuesta.getCodigoError()).append("</codigoError>\n");
-            sb.append("  <mensaje>").append(respuesta.getMensajeError()).append("</mensaje>\n");
+            sb.append("  <codigoError>").append(escaparXml(respuesta.getCodigoError())).append("</codigoError>\n");
+            sb.append("  <mensaje>").append(escaparXml(respuesta.getMensajeError())).append("</mensaje>\n");
         } else {
             sb.append("  <exito>true</exito>\n");
-            sb.append("  <cedula>").append(respuesta.getCedula()).append("</cedula>\n");
-            sb.append("  <nombre>").append(respuesta.getNombre()).append("</nombre>\n");
-            sb.append("  <primerApellido>").append(respuesta.getPrimerApellido()).append("</primerApellido>\n");
-            sb.append("  <segundoApellido>").append(respuesta.getSegundoApellido()).append("</segundoApellido>\n");
-            sb.append("  <nombreCompleto>").append(respuesta.getNombreCompleto()).append("</nombreCompleto>\n");
-            sb.append("  <provincia>").append(respuesta.getProvincia()).append("</provincia>\n");
-            sb.append("  <canton>").append(respuesta.getCanton()).append("</canton>\n");
-            sb.append("  <distrito>").append(respuesta.getDistrito()).append("</distrito>\n");
+            sb.append("  <cedula>").append(escaparXml(respuesta.getCedula())).append("</cedula>\n");
+            sb.append("  <nombre>").append(escaparXml(respuesta.getNombre())).append("</nombre>\n");
+            sb.append("  <primerApellido>").append(escaparXml(respuesta.getPrimerApellido())).append("</primerApellido>\n");
+            sb.append("  <segundoApellido>").append(escaparXml(respuesta.getSegundoApellido())).append("</segundoApellido>\n");
+            sb.append("  <nombreCompleto>").append(escaparXml(respuesta.getNombreCompleto())).append("</nombreCompleto>\n");
+            sb.append("  <provincia>").append(escaparXml(respuesta.getProvincia())).append("</provincia>\n");
+            sb.append("  <canton>").append(escaparXml(respuesta.getCanton())).append("</canton>\n");
+            sb.append("  <distrito>").append(escaparXml(respuesta.getDistrito())).append("</distrito>\n");
         }
         sb.append("</respuesta>");
         return sb.toString();
@@ -95,6 +95,53 @@ public class Serializador {
      */
     private String escaparJson(String valor) {
         if (valor == null) return "";
-        return valor.replace("\\", "\\\\").replace("\"", "\\\"");
+        StringBuilder sb = new StringBuilder();
+        for (char c : valor.toCharArray()) {
+            switch (c) {
+                case '\\': sb.append("\\\\"); break;
+                case '"':  sb.append("\\\""); break;
+                case '\b': sb.append("\\b"); break;
+                case '\f': sb.append("\\f"); break;
+                case '\n': sb.append("\\n"); break;
+                case '\r': sb.append("\\r"); break;
+                case '\t': sb.append("\\t"); break;
+                default:
+                    if (c < 0x20) {
+                        sb.append(String.format("\\u%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Escapa caracteres reservados y de control para XML.
+     */
+    private String escaparXml(String valor) {
+        if (valor == null) return "";
+
+        StringBuilder sb = new StringBuilder();
+        for (char c : valor.toCharArray()) {
+            switch (c) {
+                case '&': sb.append("&amp;"); break;
+                case '<': sb.append("&lt;"); break;
+                case '>': sb.append("&gt;"); break;
+                case '"': sb.append("&quot;"); break;
+                case '\'': sb.append("&apos;"); break;
+                default:
+                    if (esControlXmlInvalido(c)) {
+                        sb.append('?');
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        return sb.toString();
+    }
+
+    private boolean esControlXmlInvalido(char c) {
+        return c < 0x20 && c != '\n' && c != '\r' && c != '\t';
     }
 }
