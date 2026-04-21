@@ -33,6 +33,7 @@ public class HttpServerPadron {
 
     private ServerSocket serverSocket;
     private boolean      corriendo = false;
+    private final ExecutorService threadPool = Executors.newFixedThreadPool(20);
 
     // ---------------------------------------------------------------
     // Constructor
@@ -61,7 +62,7 @@ public class HttpServerPadron {
         while (corriendo) {
             try {
                 Socket cliente = serverSocket.accept();
-                poolClientes.submit(() -> manejarCliente(cliente));
+                threadPool.execute(() -> manejarCliente(cliente));
             } catch (IOException e) {
                 if (!corriendo) break;
                 System.err.println("Error aceptando conexion HTTP: " + e.getMessage());
@@ -74,6 +75,7 @@ public class HttpServerPadron {
      */
     public void detener() {
         corriendo = false;
+        threadPool.shutdown();
         if (serverSocket != null && !serverSocket.isClosed()) {
             try { serverSocket.close(); } catch (IOException ignored) {}
         }
@@ -107,17 +109,32 @@ public class HttpServerPadron {
             String requestLine = entrada.readLine();
             if (requestLine == null || requestLine.isBlank()) return;
 
+            if (!requestLine.startsWith("GET")) {
+                salida.print(construirRespuestaHttp(405, "text/plain", "Metodo No Permitido"));
+                salida.flush();
+                return;
+            }
+            
             // Consumir headers hasta línea vacía (requerido por protocolo HTTP)
             String headerLine;
             while ((headerLine = entrada.readLine()) != null && !headerLine.isBlank()) {}
 
             // Extraer query string
             String queryString = "";
+            SolicitudPadron solicitud;
+            
             if (requestLine.contains("?")) {
                 queryString = requestLine.split("\\?")[1].split(" ")[0];
+                solicitud = parsearParametros(queryString);
+            } else if (requestLine.contains("/padron/")) {
+                // Soporte para /padron/{cedula}
+                String path = requestLine.split(" ")[1].split("\\?")[0];
+                String cedula = path.substring(path.lastIndexOf("/") + 1);
+                solicitud = new SolicitudPadron(cedula, FormatoSalida.JSON);
+            } else {
+                solicitud = parsearParametros("");
             }
 
-            SolicitudPadron solicitud = parsearParametros(queryString);
             RespuestaPadron respuesta = servicio.consultarPadron(solicitud);
 
             String contentType = solicitud.getFormato() == FormatoSalida.XML
