@@ -13,6 +13,9 @@ import com.padron.entidades.Persona;
 public class RespuestaPadron {
 
     private String cedula;
+    private String nombre;
+    private String primerApellido;
+    private String segundoApellido;
     private String nombreCompleto;
     private String provincia;
     private String canton;
@@ -25,8 +28,12 @@ public class RespuestaPadron {
     }
 
     /** Constructor para una respuesta exitosa. */
-    public RespuestaPadron(String cedula, String nombreCompleto, String provincia, String canton, String distrito) {
+    public RespuestaPadron(String cedula, String nombre, String primerApellido, String segundoApellido,
+                           String nombreCompleto, String provincia, String canton, String distrito) {
         this.cedula = cedula;
+        this.nombre = nombre;
+        this.primerApellido = primerApellido;
+        this.segundoApellido = segundoApellido;
         this.nombreCompleto = nombreCompleto;
         this.provincia = provincia;
         this.canton = canton;
@@ -43,6 +50,9 @@ public class RespuestaPadron {
     public static RespuestaPadron exitosa(Persona persona, Direccion direccion) {
         return new RespuestaPadron(
                 persona != null ? persona.getCedula() : null,
+                persona != null ? persona.getNombre() : null,
+                persona != null ? persona.getPrimerApellido() : null,
+                persona != null ? persona.getSegundoApellido() : null,
                 persona != null ? persona.getNombreCompleto() : null,
                 direccion != null ? direccion.getProvincia() : null,
                 direccion != null ? direccion.getCanton() : null,
@@ -66,6 +76,30 @@ public class RespuestaPadron {
 
     public void setCedula(String cedula) {
         this.cedula = cedula;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getPrimerApellido() {
+        return primerApellido;
+    }
+
+    public void setPrimerApellido(String primerApellido) {
+        this.primerApellido = primerApellido;
+    }
+
+    public String getSegundoApellido() {
+        return segundoApellido;
+    }
+
+    public void setSegundoApellido(String segundoApellido) {
+        this.segundoApellido = segundoApellido;
     }
 
     public String getNombreCompleto() {
@@ -120,6 +154,9 @@ public class RespuestaPadron {
     public String toString() {
         return "RespuestaPadron{" +
                 "cedula='" + cedula + '\'' +
+                ", nombre='" + nombre + '\'' +
+                ", primerApellido='" + primerApellido + '\'' +
+                ", segundoApellido='" + segundoApellido + '\'' +
                 ", nombreCompleto='" + nombreCompleto + '\'' +
                 ", provincia='" + provincia + '\'' +
                 ", canton='" + canton + '\'' +

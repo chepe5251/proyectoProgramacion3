@@ -165,7 +165,10 @@ cedula=109870456&formato=json
 {
   "exito": true,
   "cedula": "109870456",
-  "nombre": "MARIA FERNANDA JIMENEZ ROJAS",
+  "nombre": "MARIA FERNANDA",
+  "primerApellido": "JIMENEZ",
+  "segundoApellido": "ROJAS",
+  "nombreCompleto": "MARIA FERNANDA JIMENEZ ROJAS",
   "provincia": "SAN JOSE",
   "canton": "SAN JOSE",
   "distrito": "CARMEN"
@@ -187,7 +190,10 @@ cedula=109870456&formato=xml
 <respuesta>
   <exito>true</exito>
   <cedula>109870456</cedula>
-  <nombre>MARIA FERNANDA JIMENEZ ROJAS</nombre>
+  <nombre>MARIA FERNANDA</nombre>
+  <primerApellido>JIMENEZ</primerApellido>
+  <segundoApellido>ROJAS</segundoApellido>
+  <nombreCompleto>MARIA FERNANDA JIMENEZ ROJAS</nombreCompleto>
   <provincia>SAN JOSE</provincia>
   <canton>SAN JOSE</canton>
   <distrito>CARMEN</distrito>
@@ -254,7 +260,10 @@ Connection: close
 {
   "exito": true,
   "cedula": "109870456",
-  "nombre": "MARIA FERNANDA JIMENEZ ROJAS",
+  "nombre": "MARIA FERNANDA",
+  "primerApellido": "JIMENEZ",
+  "segundoApellido": "ROJAS",
+  "nombreCompleto": "MARIA FERNANDA JIMENEZ ROJAS",
   "provincia": "SAN JOSE",
   "canton": "SAN JOSE",
   "distrito": "CARMEN"
@@ -280,7 +289,10 @@ Connection: close
 <respuesta>
   <exito>true</exito>
   <cedula>109870456</cedula>
-  <nombre>MARIA FERNANDA JIMENEZ ROJAS</nombre>
+  <nombre>MARIA FERNANDA</nombre>
+  <primerApellido>JIMENEZ</primerApellido>
+  <segundoApellido>ROJAS</segundoApellido>
+  <nombreCompleto>MARIA FERNANDA JIMENEZ ROJAS</nombreCompleto>
   <provincia>SAN JOSE</provincia>
   <canton>SAN JOSE</canton>
   <distrito>CARMEN</distrito>

@@ -48,7 +48,10 @@ public class Serializador {
         } else {
             sb.append("  \"exito\": true,\n");
             sb.append("  \"cedula\": \"").append(escaparJson(respuesta.getCedula())).append("\",\n");
-            sb.append("  \"nombre\": \"").append(escaparJson(respuesta.getNombreCompleto())).append("\",\n");
+            sb.append("  \"nombre\": \"").append(escaparJson(respuesta.getNombre())).append("\",\n");
+            sb.append("  \"primerApellido\": \"").append(escaparJson(respuesta.getPrimerApellido())).append("\",\n");
+            sb.append("  \"segundoApellido\": \"").append(escaparJson(respuesta.getSegundoApellido())).append("\",\n");
+            sb.append("  \"nombreCompleto\": \"").append(escaparJson(respuesta.getNombreCompleto())).append("\",\n");
             sb.append("  \"provincia\": \"").append(escaparJson(respuesta.getProvincia())).append("\",\n");
             sb.append("  \"canton\": \"").append(escaparJson(respuesta.getCanton())).append("\",\n");
             sb.append("  \"distrito\": \"").append(escaparJson(respuesta.getDistrito())).append("\"\n");
@@ -71,7 +74,10 @@ public class Serializador {
         } else {
             sb.append("  <exito>true</exito>\n");
             sb.append("  <cedula>").append(respuesta.getCedula()).append("</cedula>\n");
-            sb.append("  <nombre>").append(respuesta.getNombreCompleto()).append("</nombre>\n");
+            sb.append("  <nombre>").append(respuesta.getNombre()).append("</nombre>\n");
+            sb.append("  <primerApellido>").append(respuesta.getPrimerApellido()).append("</primerApellido>\n");
+            sb.append("  <segundoApellido>").append(respuesta.getSegundoApellido()).append("</segundoApellido>\n");
+            sb.append("  <nombreCompleto>").append(respuesta.getNombreCompleto()).append("</nombreCompleto>\n");
             sb.append("  <provincia>").append(respuesta.getProvincia()).append("</provincia>\n");
             sb.append("  <canton>").append(respuesta.getCanton()).append("</canton>\n");
             sb.append("  <distrito>").append(respuesta.getDistrito()).append("</distrito>\n");
