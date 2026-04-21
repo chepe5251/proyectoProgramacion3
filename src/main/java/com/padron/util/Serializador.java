@@ -73,11 +73,10 @@ public class Serializador {
             sb.append("  <mensaje>").append(escaparXml(respuesta.getMensajeError())).append("</mensaje>\n");
         } else {
             sb.append("  <exito>true</exito>\n");
-            sb.append("  <cedula>").append(escaparXml(respuesta.getCedula())).append("</cedula>\n");
-            sb.append("  <nombre>").append(escaparXml(respuesta.getNombre())).append("</nombre>\n");
+           sb.append("  <cedula>").append(escaparXml(respuesta.getCedula())).append("</cedula>\n");
+            sb.append("  <nombre>").append(escaparXml(respuesta.getNombreCompleto())).append("</nombre>\n");
             sb.append("  <primerApellido>").append(escaparXml(respuesta.getPrimerApellido())).append("</primerApellido>\n");
             sb.append("  <segundoApellido>").append(escaparXml(respuesta.getSegundoApellido())).append("</segundoApellido>\n");
-            sb.append("  <nombreCompleto>").append(escaparXml(respuesta.getNombreCompleto())).append("</nombreCompleto>\n");
             sb.append("  <provincia>").append(escaparXml(respuesta.getProvincia())).append("</provincia>\n");
             sb.append("  <canton>").append(escaparXml(respuesta.getCanton())).append("</canton>\n");
             sb.append("  <distrito>").append(escaparXml(respuesta.getDistrito())).append("</distrito>\n");
@@ -122,23 +121,11 @@ public class Serializador {
     private String escaparXml(String valor) {
         if (valor == null) return "";
 
-        StringBuilder sb = new StringBuilder();
-        for (char c : valor.toCharArray()) {
-            switch (c) {
-                case '&': sb.append("&amp;"); break;
-                case '<': sb.append("&lt;"); break;
-                case '>': sb.append("&gt;"); break;
-                case '"': sb.append("&quot;"); break;
-                case '\'': sb.append("&apos;"); break;
-                default:
-                    if (esControlXmlInvalido(c)) {
-                        sb.append('?');
-                    } else {
-                        sb.append(c);
-                    }
-            }
-        }
-        return sb.toString();
+        return valor.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&apos;");
     }
 
     private boolean esControlXmlInvalido(char c) {
