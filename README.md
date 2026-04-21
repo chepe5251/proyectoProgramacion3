@@ -9,10 +9,10 @@ disponible a través de interfaces TCP y HTTP con respuesta en JSON o XML.
 
 | Nombre                          | GitHub     |
 |---------------------------------|------------|
-| Alejandro Rodríguez Sanabria    | Chepe5251      |
+| Alejandro Rodríguez Sanabria    | Chepe5251  |
 | Cristian Meléndez García        | akatosh92  |
 | Pablo Enrique Delgado Miranda   | Pabloedm88 |
-| Santiago Vallejos Arias         |     |
+| Santiago Vallejos Arias         |            |
 --
 
 ## Requisitos
@@ -388,3 +388,16 @@ src/main/java/com/padron/
 ```
 
 No se usan frameworks externos: sockets Java puros, serialización manual, repositorios en `HashMap`.
+
+---
+
+## Addendum de evaluaciÃ³n
+
+Cambios incorporados para alinear el proyecto con la rÃºbrica:
+
+- normalizaciÃ³n de cÃ©dula antes de validar y consultar
+- soporte HTTP para `GET /padron/{cedula}`
+- soporte de `405 Method Not Allowed`
+- soporte del alias `format` ademÃ¡s de `formato`
+- pruebas JUnit en `src/test/java`
+- informe tÃ©cnico adicional en `INFORME_TECNICO.md`

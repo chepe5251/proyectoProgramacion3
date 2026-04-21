@@ -13,14 +13,14 @@ class SerializadorTest {
     @Test
     void escapaCaracteresEspecialesEnJson() {
         RespuestaPadron respuesta = new RespuestaPadron(
-                "115050133",
-                "ANA \"MARIA\"",
-                "LOPEZ\nUNO",
-                "GARCIA\tDOS",
-                "ANA \"MARIA\" LOPEZ\nUNO GARCIA\tDOS",
-                "SAN \\ JOSE",
-                "A",
-                "B"
+            "115050133",
+            "ANA \"MARIA\"",
+            "LOPEZ\nUNO",
+            "GARCIA\tDOS",
+            "ANA \"MARIA\" LOPEZ\nUNO GARCIA\tDOS",
+            "SAN \\ JOSE",
+            "A",
+            "B"
         );
 
         String json = serializador.serializar(respuesta, FormatoSalida.JSON);
@@ -34,14 +34,14 @@ class SerializadorTest {
     @Test
     void escapaCaracteresReservadosEnXml() {
         RespuestaPadron respuesta = new RespuestaPadron(
-                "115050133",
-                "ANA & BOB",
-                "LOPEZ <UNO>",
-                "GARCIA \"DOS\"",
-                "ANA & BOB LOPEZ <UNO> GARCIA \"DOS\"",
-                "SAN > JOSE",
-                "A",
-                "B"
+            "115050133",
+            "ANA & BOB",
+            "LOPEZ <UNO>",
+            "GARCIA \"DOS\"",
+            "ANA & BOB LOPEZ <UNO> GARCIA \"DOS\"",
+            "SAN > JOSE",
+            "A",
+            "B"
         );
 
         String xml = serializador.serializar(respuesta, FormatoSalida.XML);
@@ -50,5 +50,45 @@ class SerializadorTest {
         assertTrue(xml.contains("LOPEZ &lt;UNO&gt;"));
         assertTrue(xml.contains("GARCIA &quot;DOS&quot;"));
         assertTrue(xml.contains("SAN &gt; JOSE"));
+    }
+
+    @Test
+    void serializaJsonConApellidosYEscapeBasico() {
+        RespuestaPadron respuesta = new RespuestaPadron(
+            "109870456",
+            "ANA \"MARIA\"",
+            "LOPEZ",
+            "ROJAS",
+            "ANA \"MARIA\" LOPEZ ROJAS",
+            "SAN JOSE",
+            "ESCAZU",
+            "SAN RAFAEL"
+        );
+
+        String json = serializador.serializar(respuesta, FormatoSalida.JSON);
+
+        assertTrue(json.contains("\"primerApellido\": \"LOPEZ\""));
+        assertTrue(json.contains("\"segundoApellido\": \"ROJAS\""));
+        assertTrue(json.contains("\\\"MARIA\\\""));
+    }
+
+    @Test
+    void serializaXmlConEscapeBasico() {
+        RespuestaPadron respuesta = new RespuestaPadron(
+            "109870456",
+            "ANA & MARIA",
+            "LOPEZ",
+            "ROJAS",
+            "ANA & MARIA LOPEZ ROJAS",
+            "SAN JOSE",
+            "ESCAZU",
+            "SAN RAFAEL"
+        );
+
+        String xml = serializador.serializar(respuesta, FormatoSalida.XML);
+
+        assertTrue(xml.contains("<primerApellido>LOPEZ</primerApellido>"));
+        assertTrue(xml.contains("<segundoApellido>ROJAS</segundoApellido>"));
+        assertTrue(xml.contains("ANA &amp; MARIA"));
     }
 }

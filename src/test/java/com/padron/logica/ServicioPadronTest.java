@@ -23,10 +23,13 @@ class ServicioPadronTest {
 
     @Test
     void retornaRespuestaExitosaConNombreApellidosYDireccion() throws IOException {
-        ServicioPadron servicio = crearServicio();
+        ServicioPadron servicio = crearServicio(
+            "115050133,303005, ,20260914,00000,CRISTIAN JOAN                 ,MELENDEZ                  ,GARCIA                    ",
+            "303005,CARTAGO,LA UNION,SAN RAFAEL"
+        );
 
         RespuestaPadron respuesta = servicio.consultarPadron(
-                new SolicitudPadron("115050133", FormatoSalida.JSON)
+            new SolicitudPadron("115050133", FormatoSalida.JSON)
         );
 
         assertFalse(respuesta.esError());
@@ -42,10 +45,13 @@ class ServicioPadronTest {
 
     @Test
     void retorna404CuandoLaCedulaNoExiste() throws IOException {
-        ServicioPadron servicio = crearServicio();
+        ServicioPadron servicio = crearServicio(
+            "115050133,303005, ,20260914,00000,CRISTIAN JOAN                 ,MELENDEZ                  ,GARCIA                    ",
+            "303005,CARTAGO,LA UNION,SAN RAFAEL"
+        );
 
         RespuestaPadron respuesta = servicio.consultarPadron(
-                new SolicitudPadron("000000001", FormatoSalida.JSON)
+            new SolicitudPadron("000000001", FormatoSalida.JSON)
         );
 
         assertTrue(respuesta.esError());
@@ -55,10 +61,13 @@ class ServicioPadronTest {
 
     @Test
     void retorna400CuandoLaCedulaEsInvalida() throws IOException {
-        ServicioPadron servicio = crearServicio();
+        ServicioPadron servicio = crearServicio(
+            "115050133,303005, ,20260914,00000,CRISTIAN JOAN                 ,MELENDEZ                  ,GARCIA                    ",
+            "303005,CARTAGO,LA UNION,SAN RAFAEL"
+        );
 
         RespuestaPadron respuesta = servicio.consultarPadron(
-                new SolicitudPadron("12345", FormatoSalida.JSON)
+            new SolicitudPadron("12345", FormatoSalida.JSON)
         );
 
         assertTrue(respuesta.esError());
@@ -66,18 +75,45 @@ class ServicioPadronTest {
         assertEquals("Cedula invalida: debe contener exactamente 9 digitos.", respuesta.getMensajeError());
     }
 
-    private ServicioPadron crearServicio() throws IOException {
+    @Test
+    void consultaNormalizaCedulaAntesDeBuscar() throws IOException {
+        ServicioPadron servicio = crearServicio(
+            "109870456,001,,20260101,,MARIA FERNANDA,JIMENEZ,ROJAS",
+            "001,SAN JOSE,SAN JOSE,CARMEN"
+        );
+
+        RespuestaPadron respuesta = servicio.consultarPadron(
+            new SolicitudPadron("1-0987-0456", FormatoSalida.JSON)
+        );
+
+        assertFalse(respuesta.esError());
+        assertEquals("109870456", respuesta.getCedula());
+        assertEquals("JIMENEZ", respuesta.getPrimerApellido());
+        assertEquals("ROJAS", respuesta.getSegundoApellido());
+        assertEquals("MARIA FERNANDA JIMENEZ ROJAS", respuesta.getNombreCompleto());
+    }
+
+    @Test
+    void consultaRetorna400CuandoCedulaNormalizadaNoTieneNueveDigitos() throws IOException {
+        ServicioPadron servicio = crearServicio(
+            "109870456,001,,20260101,,MARIA FERNANDA,JIMENEZ,ROJAS",
+            "001,SAN JOSE,SAN JOSE,CARMEN"
+        );
+
+        RespuestaPadron respuesta = servicio.consultarPadron(
+            new SolicitudPadron("1-23", FormatoSalida.JSON)
+        );
+
+        assertTrue(respuesta.esError());
+        assertEquals("400", respuesta.getCodigoError());
+    }
+
+    private ServicioPadron crearServicio(String lineaPadron, String lineaDistelec) throws IOException {
         Path archivoPadron = tempDir.resolve("PADRON.txt");
         Path archivoDistelec = tempDir.resolve("distelec.txt");
 
-        Files.writeString(
-                archivoPadron,
-                "115050133,303005, ,20260914,00000,CRISTIAN JOAN                 ,MELENDEZ                  ,GARCIA                    "
-        );
-        Files.writeString(
-                archivoDistelec,
-                "303005,CARTAGO,LA UNION,SAN RAFAEL"
-        );
+        Files.writeString(archivoPadron, lineaPadron);
+        Files.writeString(archivoDistelec, lineaDistelec);
 
         RepositorioPadron repositorioPadron = new RepositorioPadron(archivoPadron.toString());
         RepositorioDistelec repositorioDistelec = new RepositorioDistelec(archivoDistelec.toString());

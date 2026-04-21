@@ -18,43 +18,30 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Servidor HTTP mínimo (raw sockets) para consultas al padrón.
+ * Servidor HTTP mÃ­nimo (raw sockets) para consultas al padrÃ³n.
  *
  * Endpoint: GET /padron?cedula=109870456&formato=json HTTP/1.1
  * Respuesta: HTTP/1.1 200 OK con Content-Type application/json o application/xml
  */
 public class HttpServerPadron {
     private static final int TAMANO_POOL = 20;
+    private static final String ENDPOINT_PADRON = "/padron";
 
-    private final int            puerto;
+    private final int puerto;
     private final ServicioPadron servicio;
-    private final Serializador   serializador;
+    private final Serializador serializador;
     private final ExecutorService poolClientes;
 
     private ServerSocket serverSocket;
-    private boolean      corriendo = false;
-    private final ExecutorService threadPool = Executors.newFixedThreadPool(20);
-
-    // ---------------------------------------------------------------
-    // Constructor
-    // ---------------------------------------------------------------
+    private boolean corriendo = false;
 
     public HttpServerPadron(int puerto, ServicioPadron servicio, Serializador serializador) {
-        this.puerto       = puerto;
-        this.servicio     = servicio;
+        this.puerto = puerto;
+        this.servicio = servicio;
         this.serializador = serializador;
         this.poolClientes = Executors.newFixedThreadPool(TAMANO_POOL);
     }
 
-    // ---------------------------------------------------------------
-    // Ciclo de vida
-    // ---------------------------------------------------------------
-
-    /**
-     * Inicia el servidor HTTP y entra al loop de aceptar conexiones.
-     *
-     * @throws IOException si no se puede abrir el puerto
-     */
     public void iniciar() throws IOException {
         serverSocket = new ServerSocket(puerto);
         corriendo = true;
@@ -62,7 +49,7 @@ public class HttpServerPadron {
         while (corriendo) {
             try {
                 Socket cliente = serverSocket.accept();
-                threadPool.execute(() -> manejarCliente(cliente));
+                poolClientes.submit(() -> manejarCliente(cliente));
             } catch (IOException e) {
                 if (!corriendo) break;
                 System.err.println("Error aceptando conexion HTTP: " + e.getMessage());
@@ -70,12 +57,8 @@ public class HttpServerPadron {
         }
     }
 
-    /**
-     * Detiene el servidor cerrando el ServerSocket.
-     */
     public void detener() {
         corriendo = false;
-        threadPool.shutdown();
         if (serverSocket != null && !serverSocket.isClosed()) {
             try { serverSocket.close(); } catch (IOException ignored) {}
         }
@@ -90,57 +73,36 @@ public class HttpServerPadron {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Manejo de requests
-    // ---------------------------------------------------------------
-
-    /**
-     * Lee y responde una request HTTP desde el socket en su propio Thread.
-     *
-     * @param cliente socket del cliente conectado
-     */
     private void manejarCliente(Socket cliente) {
         try (
             BufferedReader entrada = new BufferedReader(
                 new InputStreamReader(cliente.getInputStream()));
             PrintWriter salida = new PrintWriter(cliente.getOutputStream(), true)
         ) {
-            // Leer primera línea: "GET /padron?cedula=X&formato=Y HTTP/1.1"
             String requestLine = entrada.readLine();
             if (requestLine == null || requestLine.isBlank()) return;
 
-            if (!requestLine.startsWith("GET")) {
-                salida.print(construirRespuestaHttp(405, "text/plain", "Metodo No Permitido"));
-                salida.flush();
-                return;
-            }
-            
-            // Consumir headers hasta línea vacía (requerido por protocolo HTTP)
             String headerLine;
             while ((headerLine = entrada.readLine()) != null && !headerLine.isBlank()) {}
 
-            // Extraer query string
-            String queryString = "";
-            SolicitudPadron solicitud;
-            
-            if (requestLine.contains("?")) {
-                queryString = requestLine.split("\\?")[1].split(" ")[0];
-                solicitud = parsearParametros(queryString);
-            } else if (requestLine.contains("/padron/")) {
-                // Soporte para /padron/{cedula}
-                String path = requestLine.split(" ")[1].split("\\?")[0];
-                String cedula = path.substring(path.lastIndexOf("/") + 1);
-                solicitud = new SolicitudPadron(cedula, FormatoSalida.JSON);
-            } else {
-                solicitud = parsearParametros("");
+            HttpRequestData requestData = parsearRequestLine(requestLine);
+            if (requestData.statusCode != 200) {
+                RespuestaPadron error = RespuestaPadron.error(
+                    String.valueOf(requestData.statusCode),
+                    requestData.errorMessage
+                );
+                String body = serializador.serializar(error, requestData.formato);
+                salida.print(construirRespuestaHttp(requestData.statusCode, contentType(requestData.formato), body));
+                salida.flush();
+                return;
             }
 
+            SolicitudPadron solicitud = requestData.solicitud;
             RespuestaPadron respuesta = servicio.consultarPadron(solicitud);
 
-            String contentType = solicitud.getFormato() == FormatoSalida.XML
-                               ? "application/xml" : "application/json";
-            String body        = serializador.serializar(respuesta, solicitud.getFormato());
-            int    status      = obtenerStatusHttp(respuesta);
+            String contentType = contentType(solicitud.getFormato());
+            String body = serializador.serializar(respuesta, solicitud.getFormato());
+            int status = obtenerStatusHttp(respuesta);
 
             salida.print(construirRespuestaHttp(status, contentType, body));
             salida.flush();
@@ -151,36 +113,90 @@ public class HttpServerPadron {
         }
     }
 
-    /**
-     * Extrae los parámetros de la query string de una URL.
-     *
-     * @param queryString la parte "cedula=...&formato=..." de la URL
-     * @return            SolicitudPadron con los parámetros extraídos
-     */
-    private SolicitudPadron parsearParametros(String queryString) {
+    HttpRequestData parsearRequestLine(String requestLine) {
+        String[] partes = requestLine.trim().split("\\s+");
+        if (partes.length < 3) {
+            return HttpRequestData.error(400, "Request HTTP invalido.");
+        }
+
+        String metodo = partes[0].trim();
+        String target = partes[1].trim();
+        FormatoSalida formato = extraerFormatoDesdeTarget(target);
+
+        if (!"GET".equalsIgnoreCase(metodo)) {
+            return HttpRequestData.error(405, "Metodo no permitido. Use GET.", formato);
+        }
+
+        String ruta = extraerRuta(target);
+        if (!ruta.equals(ENDPOINT_PADRON) && !ruta.startsWith(ENDPOINT_PADRON + "/")) {
+            return HttpRequestData.error(404, "Endpoint no encontrado.", formato);
+        }
+
+        SolicitudPadron solicitud = parsearParametros(extraerQueryString(target));
+        String cedulaEnRuta = extraerCedulaDesdeRuta(ruta);
+        if (cedulaEnRuta != null && !cedulaEnRuta.isBlank()) {
+            solicitud.setCedula(cedulaEnRuta);
+        }
+
+        if (solicitud.getFormato() == null) {
+            solicitud.setFormato(FormatoSalida.JSON);
+        }
+
+        return HttpRequestData.ok(solicitud);
+    }
+
+    SolicitudPadron parsearParametros(String queryString) {
         SolicitudPadron solicitud = new SolicitudPadron();
         if (queryString == null || queryString.isBlank()) return solicitud;
         for (String par : queryString.split("&")) {
             String[] kv = par.split("=", 2);
             if (kv.length < 2) continue;
-            switch (kv[0].trim()) {
-                case "cedula":  solicitud.setCedula(kv[1].trim()); break;
+            switch (kv[0].trim().toLowerCase()) {
+                case "cedula":
+                    solicitud.setCedula(kv[1].trim());
+                    break;
                 case "formato":
-                    try { solicitud.setFormato(FormatoSalida.fromString(kv[1].trim())); }
-                    catch (IllegalArgumentException e) { /* mantener default JSON */ }
+                case "format":
+                    solicitud.setFormato(FormatoSalida.fromString(kv[1].trim()));
                     break;
             }
         }
         return solicitud;
     }
 
-    /**
-     * Construye una respuesta HTTP completa como String.
-     */
+    private String extraerRuta(String target) {
+        int indiceQuery = target.indexOf('?');
+        return indiceQuery >= 0 ? target.substring(0, indiceQuery) : target;
+    }
+
+    private String extraerQueryString(String target) {
+        int indiceQuery = target.indexOf('?');
+        return indiceQuery >= 0 ? target.substring(indiceQuery + 1) : "";
+    }
+
+    private String extraerCedulaDesdeRuta(String ruta) {
+        if (ruta == null || !ruta.startsWith(ENDPOINT_PADRON + "/")) {
+            return null;
+        }
+
+        String cedula = ruta.substring((ENDPOINT_PADRON + "/").length()).trim();
+        return cedula.isEmpty() || cedula.contains("/") ? null : cedula;
+    }
+
+    private FormatoSalida extraerFormatoDesdeTarget(String target) {
+        SolicitudPadron solicitud = parsearParametros(extraerQueryString(target));
+        return solicitud.getFormato() != null ? solicitud.getFormato() : FormatoSalida.JSON;
+    }
+
+    private String contentType(FormatoSalida formato) {
+        return formato == FormatoSalida.XML ? "application/xml" : "application/json";
+    }
+
     private String construirRespuestaHttp(int statusCode, String contentType, String body) {
         String statusText = statusCode == 200 ? "OK"
                           : statusCode == 400 ? "Bad Request"
                           : statusCode == 404 ? "Not Found"
+                          : statusCode == 405 ? "Method Not Allowed"
                           : "Internal Server Error";
         return "HTTP/1.1 " + statusCode + " " + statusText + "\r\n"
              + "Content-Type: " + contentType + "; charset=UTF-8\r\n"
@@ -202,10 +218,32 @@ public class HttpServerPadron {
         }
     }
 
-    // ---------------------------------------------------------------
-    // Getters de estado
-    // ---------------------------------------------------------------
-
     public boolean isCorriendo() { return corriendo; }
-    public int     getPuerto()   { return puerto; }
+    public int getPuerto() { return puerto; }
+
+    static class HttpRequestData {
+        final int statusCode;
+        final String errorMessage;
+        final SolicitudPadron solicitud;
+        final FormatoSalida formato;
+
+        private HttpRequestData(int statusCode, String errorMessage, SolicitudPadron solicitud, FormatoSalida formato) {
+            this.statusCode = statusCode;
+            this.errorMessage = errorMessage;
+            this.solicitud = solicitud;
+            this.formato = formato != null ? formato : FormatoSalida.JSON;
+        }
+
+        static HttpRequestData ok(SolicitudPadron solicitud) {
+            return new HttpRequestData(200, null, solicitud, solicitud != null ? solicitud.getFormato() : FormatoSalida.JSON);
+        }
+
+        static HttpRequestData error(int statusCode, String errorMessage) {
+            return new HttpRequestData(statusCode, errorMessage, null, FormatoSalida.JSON);
+        }
+
+        static HttpRequestData error(int statusCode, String errorMessage, FormatoSalida formato) {
+            return new HttpRequestData(statusCode, errorMessage, null, formato);
+        }
+    }
 }

@@ -12,12 +12,12 @@ import com.padron.entidades.Persona;
  * Coordina los repositorios y produce una RespuestaPadron.
  *
  * Esta clase NO sabe nada de TCP, HTTP, JSON ni XML.
- * Esa responsabilidad es de las capas de presentación y util.
+ * Esa responsabilidad es de las capas de presentaciÃ³n y util.
  */
 public class ServicioPadron {
 
-    private final RepositorioPadron    repositorioPadron;
-    private final RepositorioDistelec  repositorioDistelec;
+    private final RepositorioPadron repositorioPadron;
+    private final RepositorioDistelec repositorioDistelec;
 
     // ---------------------------------------------------------------
     // Constructor
@@ -25,16 +25,16 @@ public class ServicioPadron {
 
     public ServicioPadron(RepositorioPadron repositorioPadron,
                           RepositorioDistelec repositorioDistelec) {
-        this.repositorioPadron   = repositorioPadron;
+        this.repositorioPadron = repositorioPadron;
         this.repositorioDistelec = repositorioDistelec;
     }
 
     // ---------------------------------------------------------------
-    // Métodos públicos
+    // MÃ©todos pÃºblicos
     // ---------------------------------------------------------------
 
     /**
-     * Procesa una solicitud de consulta al padrón.
+     * Procesa una solicitud de consulta al padrÃ³n.
      *
      * @param solicitud datos de la consulta
      * @return          respuesta con los datos o mensaje de error
@@ -43,31 +43,48 @@ public class ServicioPadron {
         if (solicitud == null || !solicitud.esValida()) {
             return RespuestaPadron.error("400", "Solicitud invalida: cedula y formato son requeridos.");
         }
-        if (!validarCedula(solicitud.getCedula())) {
+
+        String cedulaNormalizada = normalizarCedula(solicitud.getCedula());
+        solicitud.setCedula(cedulaNormalizada);
+
+        if (!validarCedula(cedulaNormalizada)) {
             return RespuestaPadron.error("400", "Cedula invalida: debe contener exactamente 9 digitos.");
         }
-        Persona persona = repositorioPadron.buscarPorCedula(solicitud.getCedula());
+
+        Persona persona = repositorioPadron.buscarPorCedula(cedulaNormalizada);
         if (persona == null) {
             return RespuestaPadron.error("404", "Cedula no encontrada en el padron.");
         }
+
         Direccion direccion = repositorioDistelec.buscarPorCodElectoral(persona.getCodElectoral());
         return RespuestaPadron.exitosa(persona, direccion);
     }
 
     // ---------------------------------------------------------------
-    // Métodos privados
+    // MÃ©todos privados
     // ---------------------------------------------------------------
 
     /**
-     * Valida que la cédula tenga exactamente 9 dígitos.
+     * Valida que la cÃ©dula tenga exactamente 9 dÃ­gitos.
      *
-     * @return true si la cédula es válida
+     * @return true si la cÃ©dula es vÃ¡lida
      */
     private boolean validarCedula(String cedula) {
-       if (cedula == null || cedula.trim().isEmpty()) {
+        if (cedula == null || cedula.trim().isEmpty()) {
             return false;
         }
-        // Debe tener exactamente 9 dígitos y ser solo números
+
         return cedula.matches("\\d{9}");
+    }
+
+    /**
+     * Normaliza la cÃ©dula removiendo espacios y separadores comunes.
+     */
+    private String normalizarCedula(String cedula) {
+        if (cedula == null) {
+            return null;
+        }
+
+        return cedula.replaceAll("[^\\d]", "");
     }
 }
