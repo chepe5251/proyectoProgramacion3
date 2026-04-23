@@ -12,7 +12,7 @@ disponible a través de interfaces TCP y HTTP con respuesta en JSON o XML.
 | Alejandro Rodríguez Sanabria    | Chepe5251  |
 | Cristian Meléndez García        | akatosh92  |
 | Pablo Enrique Delgado Miranda   | Pabloedm88 |
-| Santiago Vallejos Arias         |            |
+| Santiago Vallejos Arias         | Santy200631|
 --
 
 ## Requisitos
